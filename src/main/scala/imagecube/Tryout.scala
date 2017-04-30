@@ -10,7 +10,8 @@ object Tryout extends App {
   // convertColorToPixel()
   // readImageToBufferedImage()
   // exploreImage()
-  copyImage()
+  // copyImage()
+  cropImage()
 
   def dir: File = new File("src/main/resources")
   def tmpdir: File = {
@@ -25,6 +26,16 @@ object Tryout extends App {
     val outName = s"out${UUID.randomUUID()}.jpg"
     val outFile = new File(tmpdir, outName)
     writeImage(img, outFile)
+    println(s"wrote to $outFile")
+  }
+
+  def cropImage(): Unit ={
+    import imagecube.Imagecube._
+    val img = readImage(new File(dir, "tiny.jpg"))
+    val crop = cropSquare(img)
+    val outName = s"out${UUID.randomUUID()}.jpg"
+    val outFile = new File(tmpdir, outName)
+    writeImage(crop, outFile)
     println(s"wrote to $outFile")
   }
 

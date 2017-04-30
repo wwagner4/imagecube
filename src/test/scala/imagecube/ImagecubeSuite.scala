@@ -20,17 +20,20 @@ class ImagecubeSuite extends FunSuite {
     }
   }
 
-  val px = Seq(
-    Col(0, 3, 4),
-    Col(1, 3, 4),
-    Col(2, 3, 4),
-    Col(3, 3, 4),
-    Col(4, 3, 4),
-    Col(5, 3, 4)
-  )
-  val img = Image(2, 3, px)
+  def image23: Image = {
+    val px = Seq(
+      Col(0, 3, 4),
+      Col(1, 3, 4),
+      Col(2, 3, 4),
+      Col(3, 3, 4),
+      Col(4, 3, 4),
+      Col(5, 3, 4)
+    )
+    Image(2, 3, px)
+  }
+
   test("pixel") {
-    val p = pixel(img)
+    val p = pixel(image23)
     assert(p.size === 6)
     assert(p(0) === Pixel(0, 0, Col(0, 3, 4)))
     assert(p(1) === Pixel(1, 0, Col(1, 3, 4)))
@@ -40,6 +43,24 @@ class ImagecubeSuite extends FunSuite {
     assert(p(5) === Pixel(1, 2, Col(5, 3, 4)))
   }
 
+  Seq(
+    (0, Seq(Col(0, 3, 4), Col(1, 3, 4))),
+    (1, Seq(Col(2, 3, 4), Col(3, 3, 4))),
+    (2, Seq(Col(4, 3, 4), Col(5, 3, 4)))
+  ).foreach { case (i, should) =>
+    test(s"rows$i") {
+      assert(rows(image23)(i) === should)
+    }
+  }
+
+  Seq(
+    (0, Seq(Col(0, 3, 4), Col(2, 3, 4), Col(4, 3, 4))),
+    (1, Seq(Col(1, 3, 4), Col(3, 3, 4), Col(5, 3, 4)))
+  ).foreach { case (i, should) =>
+    test(s"cols$i") {
+      assert(cols(image23)(i) === should)
+    }
+  }
 
   val imagTypeTestdata = List(
     ("PNG", "a.png"),

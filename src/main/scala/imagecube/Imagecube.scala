@@ -31,6 +31,13 @@ object Imagecube {
     }
   }
 
+  def rows(img: Image): Seq[Seq[Col]] = {
+    img.pixels.grouped(img.w).toSeq
+  }
+
+  def cols(img: Image): Seq[Seq[Col]] = {
+    img.pixels.grouped(img.w).toSeq.transpose
+  }
 
   def cropSquare(img: Image): Image = {
 
