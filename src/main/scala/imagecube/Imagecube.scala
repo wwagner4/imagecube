@@ -5,20 +5,14 @@ import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
 
-case class Col(r: Int, g: Int, b: Int)
+case class Pixel(x: Int, y: Int, col: Int)
 
-case class Pixel(x: Int, y: Int, col: Col)
-
-case class Image(w: Int, h: Int, pixels: Seq[Col])
+case class Image(w: Int, h: Int, pixels: Seq[Int])
 
 object Imagecube {
 
-  def mix(p1: Col, p2: Col): Col = {
-    Col(
-      (p1.r + p2.r) / 2,
-      (p1.g + p2.g) / 2,
-      (p1.b + p2.b) / 2
-    )
+  def mix(p1: Int, p2: Int): Int = {
+    ???
   }
 
 
@@ -33,7 +27,13 @@ object Imagecube {
     }
   }
 
-  def rows(img: Image): Seq[Seq[Col]] = {
+  def transpose(img: Image): Image = {
+    println("transposing image ...")
+    val _p = img.pixels.grouped(img.w).toSeq.transpose.flatten
+    Image(img.h, img.w, _p)
+  }
+
+  def rows(img: Image): Seq[Seq[Int]] = {
     img.pixels.grouped(img.w).toSeq
   }
 
@@ -52,29 +52,15 @@ object Imagecube {
       Image(off2 - off1, img.h, filtered)
     }
 
-    def cropSquarePortr: Image = {
-      val off1 = (img.h - img.w) / 2
-      val off2 = img.h - off1
-      val _rows = rows(img).transpose
-      val indexed = _rows.map { r => r.zipWithIndex }
-      val filtered = indexed.map { r =>
-        r
-          .filter { case (_, i) => i >= off1 && i < off2 }
-          .map { case (p, _) => p }
-      }.transpose.flatten
-      Image(img.w, off2 - off1, filtered)
-    }
-
     if (img.w == img.h) img
     else if (img.w > img.h) cropSquareLands
-    else cropSquarePortr
+    else transpose(cropSquare(transpose(img)))
   }
 
   def writeImage(img: Image, file: File): Unit = {
     val bi = new BufferedImage(img.w, img.h, BufferedImage.TYPE_INT_RGB)
     pixel(img).foreach { p =>
-      val c = new Color(p.col.r, p.col.g, p.col.b)
-      bi.setRGB(p.x, p.y, c.getRGB)
+      bi.setRGB(p.x, p.y, p.col)
     }
     ImageIO.write(bi, imageType(file), file)
   }
@@ -94,9 +80,17 @@ object Imagecube {
     val w = bi.getWidth()
     val h = bi.getHeight()
     val pxs = for (j <- 0 until h; i <- 0 until w) yield {
-      val rgb = bi.getRGB(i, j)
-      val c = new Color(rgb)
-      Col(c.getRed, c.getGreen, c.getBlue)
+      bi.getRGB(i, j)
+    }
+    Image(w, h, pxs)
+  }
+
+  def readImage(file: File): Image = {
+    val bi = ImageIO.read(file)
+    val w = bi.getWidth()
+    val h = bi.getHeight()
+    val pxs = for (j <- 0 until h; i <- 0 until w) yield {
+      bi.getRGB(i, j)
     }
     Image(w, h, pxs)
   }

@@ -32,19 +32,24 @@ object Tryout extends App {
 
   def copyImage(): Unit ={
     import imagecube.Imagecube._
-    val img = readImage(new File(dir, "cow.jpg"))
+    println("reading image ...")
+    val img = readImage(new File(dir, "big1.jpg"))
     val outName = s"out${UUID.randomUUID()}.jpg"
     val outFile = new File(tmpdir, outName)
+    println("writing image ...")
     writeImage(img, outFile)
     println(s"wrote to $outFile")
   }
 
   def cropImage(): Unit ={
     import imagecube.Imagecube._
-    val img = readImage(new File(dir, "cow1.jpg"))
+    println("reading image ...")
+    val img = readImage(new File(dir, "big1.jpg"))
+    println("cropping image ...")
     val crop = cropSquare(img)
     val outName = s"out${UUID.randomUUID()}.jpg"
     val outFile = new File(tmpdir, outName)
+    println("writing image ...")
     writeImage(crop, outFile)
     println(s"wrote to $outFile")
   }
