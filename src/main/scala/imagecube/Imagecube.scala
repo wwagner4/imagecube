@@ -31,16 +31,21 @@ object Imagecube {
     }
   }
 
-  def rows(img: Image): Seq[Seq[Pixel]] = {
-    pixel(img).grouped(img.w).toSeq
+  def rows(img: Image): Seq[Seq[Col]] = {
+    img.pixels.grouped(img.w).toSeq
   }
 
   def cropSquare(img: Image): Image = {
 
     def cropSquare1: Image = {
-      val off = (img.w - img.h) / 2
-      ???
-
+      val off1 = (img.w - img.h) / 2
+      val off2 = img.w - off1
+      val _rows = rows(img)
+      val indexed = _rows.map{r => r.zipWithIndex }
+      val i2 = indexed.flatMap{r => r
+        .filter{case (_, i) => i >= off1 && i< off2}
+        .map{case (p, _) => p}}
+      Image(off2 - off1, img.h, i2)
     }
 
     def cropSquare2: Image = {

@@ -12,6 +12,16 @@ object Tryout extends App {
   // exploreImage()
   // copyImage()
   cropImage()
+  // intArithm()
+
+  def intArithm(): Unit = {
+    val w = 7
+    val h = 3
+    val off1 = (w - h)  / 2
+    val off2 = w - off1
+    println(off1)
+    println(off2)
+  }
 
   def dir: File = new File("src/main/resources")
   def tmpdir: File = {
@@ -31,7 +41,7 @@ object Tryout extends App {
 
   def cropImage(): Unit ={
     import imagecube.Imagecube._
-    val img = readImage(new File(dir, "tiny.jpg"))
+    val img = readImage(new File(dir, "cow.jpg"))
     val crop = cropSquare(img)
     val outName = s"out${UUID.randomUUID()}.jpg"
     val outFile = new File(tmpdir, outName)
