@@ -41,7 +41,7 @@ object Tryout extends App {
 
   def cropImage(): Unit ={
     import imagecube.Imagecube._
-    val img = readImage(new File(dir, "cow.jpg"))
+    val img = readImage(new File(dir, "cow1.jpg"))
     val crop = cropSquare(img)
     val outName = s"out${UUID.randomUUID()}.jpg"
     val outFile = new File(tmpdir, outName)

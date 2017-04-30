@@ -24,7 +24,9 @@ object Imagecube {
 
   def pixel(img: Image): Seq[Pixel] = {
     def rowIndexes(w: Int) = Stream.from(0).flatMap(i => List.fill(w)(i))
+
     def colIndexes(w: Int) = Stream.from(0).flatMap(_ => 0 until w)
+
     val cols = img.pixels
     cols.zip(colIndexes(img.w)).zip(rowIndexes(img.w)).map {
       case ((col, x), y) => Pixel(x, y, col)
@@ -37,24 +39,35 @@ object Imagecube {
 
   def cropSquare(img: Image): Image = {
 
-    def cropSquare1: Image = {
+    def cropSquareLands: Image = {
       val off1 = (img.w - img.h) / 2
       val off2 = img.w - off1
       val _rows = rows(img)
-      val indexed = _rows.map{r => r.zipWithIndex }
-      val i2 = indexed.flatMap{r => r
-        .filter{case (_, i) => i >= off1 && i< off2}
-        .map{case (p, _) => p}}
-      Image(off2 - off1, img.h, i2)
+      val indexed = _rows.map { r => r.zipWithIndex }
+      val filtered = indexed.flatMap { r =>
+        r
+          .filter { case (_, i) => i >= off1 && i < off2 }
+          .map { case (p, _) => p }
+      }
+      Image(off2 - off1, img.h, filtered)
     }
 
-    def cropSquare2: Image = {
-      ???
+    def cropSquarePortr: Image = {
+      val off1 = (img.h - img.w) / 2
+      val off2 = img.h - off1
+      val _rows = rows(img).transpose
+      val indexed = _rows.map { r => r.zipWithIndex }
+      val filtered = indexed.map { r =>
+        r
+          .filter { case (_, i) => i >= off1 && i < off2 }
+          .map { case (p, _) => p }
+      }.transpose.flatten
+      Image(img.w, off2 - off1, filtered)
     }
 
     if (img.w == img.h) img
-    else if (img.w > img.h) cropSquare1
-    else cropSquare2
+    else if (img.w > img.h) cropSquareLands
+    else cropSquarePortr
   }
 
   def writeImage(img: Image, file: File): Unit = {
