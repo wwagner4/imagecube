@@ -23,20 +23,16 @@ object Imagecube {
 
 
   def pixel(img: Image): Seq[Pixel] = {
-    def rowIndexes(w: Int): Stream[Int] = Stream.from(0).flatMap(i => List.fill(w)(i))
-    def colIndexes(w: Int): Stream[Int] = Stream.from(0).flatMap(_ => 0 until w)
+    def rowIndexes(w: Int) = Stream.from(0).flatMap(i => List.fill(w)(i))
+    def colIndexes(w: Int) = Stream.from(0).flatMap(_ => 0 until w)
     val cols = img.pixels
     cols.zip(colIndexes(img.w)).zip(rowIndexes(img.w)).map {
       case ((col, x), y) => Pixel(x, y, col)
     }
   }
 
-  def rows(img: Image): Seq[Seq[Col]] = {
-    img.pixels.grouped(img.w).toSeq
-  }
-
-  def cols(img: Image): Seq[Seq[Col]] = {
-    img.pixels.grouped(img.w).toSeq.transpose
+  def rows(img: Image): Seq[Seq[Pixel]] = {
+    pixel(img).grouped(img.w).toSeq
   }
 
   def cropSquare(img: Image): Image = {
