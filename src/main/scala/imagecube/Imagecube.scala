@@ -55,7 +55,17 @@ object Imagecube {
       val c = new Color(p.col.r, p.col.g, p.col.b)
       bi.setRGB(p.x, p.y, c.getRGB)
     }
-    ImageIO.write(bi, "JPG", file)
+    ImageIO.write(bi, imageType(file), file)
+  }
+
+  def imageType(file: File): String = {
+    val i = file.getName.lastIndexOf('.')
+    if (i < 0) throw new IllegalArgumentException("file must have an image extension. .png, .jpg, ...")
+    val ext = file.getName.substring(i + 1).toUpperCase
+    ext match {
+      case "JPEG" => "JPG"
+      case _ => ext
+    }
   }
 
   def readImage(file: File): Image = {

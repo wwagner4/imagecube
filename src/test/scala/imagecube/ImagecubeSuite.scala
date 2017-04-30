@@ -1,5 +1,7 @@
 package imagecube
 
+import java.io.File
+
 import org.scalatest._
 
 class ImagecubeSuite extends FunSuite {
@@ -37,5 +39,24 @@ class ImagecubeSuite extends FunSuite {
     assert(p(4) === Pixel(0, 2, Col(4, 3, 4)))
     assert(p(5) === Pixel(1, 2, Col(5, 3, 4)))
   }
+
+
+  val imagTypeTestdata = List(
+    ("PNG", "a.png"),
+    ("PNG", "x/b.png"),
+    ("PNG", "all.Png"),
+    ("PNG", "a/a.PNG"),
+    ("JPG", "a/a.jpg"),
+    ("JPG", "a/a.jpeg"),
+    ("JPG", "a/a.JPEG"),
+    ("JPG", "a/a.JPG")
+  )
+  imagTypeTestdata.foreach { case (should, is) =>
+    test(s"imageType$should$is") {
+      assert(imageType(new File(is)) === should)
+    }
+
+  }
+
 
 }
