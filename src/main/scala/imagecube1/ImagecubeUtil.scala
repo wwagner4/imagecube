@@ -42,5 +42,20 @@ object ImagecubeUtil {
     else transpose(cutParams(height, width))
   }
 
+  def shortenA(i: Int, n: Int): (Int, Int) = {
+    val a = (3.0 * n / 2.0).toInt
+    val from = i
+    val to = a
+    (from, to)
+  }
+
+  def shortenB(i: Int, n: Int): (Int, Int) = {
+    val a = (3.0 * n / 2.0).toInt
+    val from = a
+    val to = 2 * a - i
+    (from, to)
+  }
+
+
 
 }

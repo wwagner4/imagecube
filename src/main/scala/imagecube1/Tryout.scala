@@ -21,7 +21,53 @@ object Tryout extends App {
   // diffs()
   // compress()
   // mean()
-  rgb()
+  // rgb()
+  // shorten()
+  shorten1()
+
+
+  def shorten1(): Unit = {
+
+    import Imagecube._
+    import ImagecubeUtil._
+
+
+    val fName = "tiny1.jpg"
+    val f = new File(dir, fName)
+    val img = readImage(f)
+    println(img)
+    println(s"created img for $fName")
+
+    println(s"img left size ${img.left.size}")
+
+    val newRows = img.left.map { row =>
+      val n = img.left.size
+      val (from, to) = shortenA(row.i, n)
+      val filteredCol = row.pixs.filter(p => p.i >= from && p.i < to).map { p => p.col }
+      val compressedCols = linearCompress(filteredCol, n, colorMix)
+      val newPixs = compressedCols.zipWithIndex.map { case (col, i) => Pix(i, col) }
+      Row(row.i, newPixs)
+    }
+
+    println(s"newRows size: ${newRows.size}")
+    println(s"newRows cols sizes: ${newRows.map(r => r.pixs.size).mkString(",")}")
+
+
+  }
+
+  def shorten(): Unit = {
+
+    import ImagecubeUtil._
+
+    val n = 10
+
+    val is = 0 to n
+    is.foreach { i =>
+      val (fa, ta) = shortenA(i, n)
+      val (fb, tb) = shortenB(i, n)
+      println(f"$i%3d : $fa%3d - $ta%3d : $fb%3d - $tb%3d")
+    }
+  }
 
   def rgb(): Unit = {
 
@@ -141,9 +187,8 @@ object Tryout extends App {
 
 
   def diffs(): Unit = {
-    def diff(s: Stream[Int]): Stream[Int] = {
+    def diff(s: Stream[Int]): Stream[Int] =
       s.zip(s.tail).map { case (a, b) => b - a }
-    }
 
     println("FIBS: " + fibs.take(10).mkString(", "))
     println("DIFFS: " + diff(fibs).take(10).mkString(", "))

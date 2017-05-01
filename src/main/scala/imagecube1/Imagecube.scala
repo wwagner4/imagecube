@@ -37,18 +37,19 @@ object Imagecube {
       }
     }
 
+
     def readImageTransp(bi: BufferedImage, x: Range, y: Range): Seq[Row] = {
       println(s"readImageTransp $x $y")
 
       def readRow(j: Int, r: Range): Seq[Pix] = {
-        for (i <- r.to to(r.from, -1)) yield {
+        for (i <- r.to to r.from) yield {
           val c = bi.getRGB(j, i)
           Pix(i, c)
         }
       }
 
-      for (j <- x.to to(x.from, -1)) yield {
-        Row(j, readRow(j, y))
+      for (j <- y.from to y.to) yield {
+        Row(j, readRow(j, x))
       }
     }
 
@@ -74,6 +75,7 @@ object Imagecube {
     def rgb(col: Int): Rgb = {
       Rgb((col & 0xff0000) >> 16, (col & 0xff00) >> 8, col & 0xff)
     }
+
     val size = colors.size
     val rgbs = colors.map(rgb)
     val sum = rgbs.foldLeft(Rgb(0, 0, 0))((a, b) => Rgb(a.r + b.r, a.g + b.g, a.b + b.b))
