@@ -32,7 +32,7 @@ object Tryout extends App {
     import ImagecubeUtil._
 
 
-    val fName = "tiny1.jpg"
+    val fName = "tiny.jpg"
     val f = new File(dir, fName)
     val img = readImage(f)
     println(img)
@@ -40,17 +40,30 @@ object Tryout extends App {
 
     println(s"img left size ${img.left.size}")
 
-    val newRows = img.left.zipWithIndex.map { case (row, i) =>
+    val newRowsA = img.left.zipWithIndex.map { case (row, i) =>
       val n = img.left.size
       val (from, to) = shortenA(i, n)
+      println(s"## $n $i ($from - $to)")
       val filteredCol = row.zipWithIndex
         .filter { case (_, i) => i >= from && i < to }
         .map { case (c, _) => c }
       linearCompress(filteredCol, n, colorMix)
     }
 
-    println(s"newRows size: ${newRows.size}")
-    println(s"newRows cols sizes: ${newRows.map(r => r.size).mkString(",")}")
+    val newRowsB = img.left.zipWithIndex.map { case (row, i) =>
+      val n = img.left.size
+      val (from, to) = shortenB(i, n)
+      println(s"## $n $i ($from - $to)")
+      val filteredCol = row.zipWithIndex
+        .filter { case (_, i) => i >= from && i < to }
+        .map { case (c, _) => c }
+      linearCompress(filteredCol, n, colorMix)
+    }
+
+    println(s"newRowsA size: ${newRowsA.size}")
+    println(s"newRowsA cols sizes: ${newRowsA.map(r => r.size).mkString(",")}")
+    println(s"newRowsB size: ${newRowsB.size}")
+    println(s"newRowsB cols sizes: ${newRowsB.map(r => r.size).mkString(",")}")
 
 
   }
