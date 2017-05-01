@@ -1,10 +1,89 @@
 package imagecube1
 
+import java.awt.image.BufferedImage
+import java.io.File
+import javax.imageio.ImageIO
+
 case class Range(from: Int, to: Int)
 
 case class CutParams(x1: Range, x2: Range, x3: Range, y1: Range, y2: Range, y3: Range)
 
+case class Pix(i: Int, col: Int)
+
+case class Row(i: Int, pixs: Seq[Pix])
+
+
+case class Img(
+                center: Seq[Row],
+                left: Seq[Row],
+                right: Seq[Row],
+                top: Seq[Row],
+                bottom: Seq[Row]
+              )
+
 object Imagecube {
+
+  def readImage(file: File): Img = {
+
+    def readImage(bi: BufferedImage, x: Range, y: Range): Seq[Row] = {
+      println(s"readImage $x $y")
+
+      def readRow(j: Int, r: Range): Seq[Pix] = {
+        for (i <- r.from to r.to) yield {
+          val c = bi.getRGB(i, j)
+          Pix(i, c)
+        }
+      }
+
+      for (j <- y.from to y.to) yield {
+        Row(j, readRow(j, x))
+      }
+    }
+
+    def readImageTransp(bi: BufferedImage, x: Range, y: Range): Seq[Row] = {
+      println(s"readImageTransp $x $y")
+
+      def readRow(j: Int, r: Range): Seq[Pix] = {
+        for (i <- r.to to(r.from, -1)) yield {
+          val c = bi.getRGB(j, i)
+          Pix(i, c)
+        }
+      }
+
+      for (j <- x.to to(x.from, -1)) yield {
+        Row(j, readRow(j, y))
+      }
+    }
+
+    val bi = ImageIO.read(file)
+    val w = bi.getWidth()
+    val h = bi.getHeight()
+    println(s"readImage $w $h")
+    val p = cutParams(w, h)
+    println(s"readImage $p")
+    val (xrLeft, yrLeft) = transposeParamsLeft(w, h, p)
+    val (xrRight, yrRight) = transposeParamsRight(w, h, p)
+    Img(
+      center = readImage(bi, p.x2, p.y2),
+      left = readImageTransp(bi, xrLeft, yrLeft),
+      right = readImageTransp(bi, xrRight, yrRight),
+      top = readImage(bi, Range(p.x1.from, p.x3.to), p.y1),
+      bottom = readImage(bi, Range(p.x1.from, p.x3.to), p.y3)
+    )
+  }
+
+
+  def transposeParamsLeft(w: Int, h: Int, p: CutParams): (Range, Range) = {
+    val x = Range(p.y3.to, p.y1.from)
+    val y = Range(p.x1.from, p.x1.to)
+    (x, y)
+  }
+
+  def transposeParamsRight(w: Int, h: Int, p: CutParams): (Range, Range) = {
+    val x = Range(p.y3.to, p.y1.from)
+    val y = Range(p.x3.from, p.x3.to)
+    (x, y)
+  }
 
   def cutParams(width: Int, height: Int): CutParams = {
 
