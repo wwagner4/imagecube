@@ -11,11 +11,6 @@ case class Image(w: Int, h: Int, pixels: Seq[Int])
 
 object Imagecube {
 
-  def mix(p1: Int, p2: Int): Int = {
-    ???
-  }
-
-
   def pixel(img: Image): Seq[Pixel] = {
     def rowIndexes(w: Int) = Stream.from(0).flatMap(i => List.fill(w)(i))
 

@@ -165,7 +165,7 @@ object Tryout extends App {
     )
 
     whs.foreach {
-      case (w, h) => println(s"($w, $h, ${Imagecube.cutParams(w, h)}, (Range(0, 0), Range(0, 0))),")
+      case (w, h) => println(s"($w, $h, ${ImagecubeUtil.cutParams(w, h)}, (Range(0, 0), Range(0, 0))),")
     }
   }
 
@@ -173,7 +173,7 @@ object Tryout extends App {
     import Imagecube._
     val fName = "tiny1.jpg"
     val f = new File(dir, fName)
-    val img = readImage(f).toString().take(100) + " ..."
+    val img = readImage(f).toString.take(100) + " ..."
     println(s"created img for $fName")
     println(s"img: $img")
   }

@@ -4,8 +4,6 @@ import org.scalatest.FunSuite
 
 class ImagecubeSuite extends FunSuite {
 
-  import Imagecube._
-
   val cutParamsTestValues = List(
     (7, 6, CutParams(Range(0, 1), Range(2, 3), Range(4, 5), Range(0, 1), Range(2, 3), Range(4, 5))),
     (9, 7, CutParams(Range(1, 2), Range(3, 4), Range(5, 6), Range(0, 1), Range(2, 3), Range(4, 5))),
@@ -15,7 +13,7 @@ class ImagecubeSuite extends FunSuite {
 
   cutParamsTestValues.foreach {
     case (w, h, p) => test(f"cutParams-$w%03d-$h%03d") {
-      assert(cutParams(w, h) === p)
+      assert(ImagecubeUtil.cutParams(w, h) === p)
     }
   }
 
@@ -29,7 +27,7 @@ class ImagecubeSuite extends FunSuite {
   )
   transposeParamsLeftTestValues.foreach {
     case (w, h, p, should) => test(f"transposeParamsLeftTestValues-$w%03d-$h%03d") {
-      assert(transposeParamsLeft(w, h, p) === should)
+      assert(ImagecubeUtil.transposeParamsLeft(p) === should)
     }
   }
 
@@ -43,7 +41,7 @@ class ImagecubeSuite extends FunSuite {
   )
   transposeParamsRightTestValues.foreach {
     case (w, h, p, should) => test(f"transposeParamsRightTestValues-$w%03d-$h%03d") {
-      assert(transposeParamsRight(w, h, p) === should)
+      assert(ImagecubeUtil.transposeParamsRight(p) === should)
     }
   }
 }
