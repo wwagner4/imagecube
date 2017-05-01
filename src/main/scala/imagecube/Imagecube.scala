@@ -85,15 +85,4 @@ object Imagecube {
     Image(w, h, pxs)
   }
 
-  def readImage(file: File): Image = {
-    val bi = ImageIO.read(file)
-    val w = bi.getWidth()
-    val h = bi.getHeight()
-    val pxs = for (j <- 0 until h; i <- 0 until w) yield {
-      bi.getRGB(i, j)
-    }
-    Image(w, h, pxs)
-  }
-
-
 }
