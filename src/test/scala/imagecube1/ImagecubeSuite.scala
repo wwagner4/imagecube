@@ -14,7 +14,7 @@ class ImagecubeSuite extends FunSuite {
   )
 
   cutParamsTestValues.foreach {
-    case (w, h, p) => test(s"cutParams$w$h") {
+    case (w, h, p) => test(f"cutParams-$w%03d-$h%03d") {
       assert(cutParams(w, h) === p)
     }
   }
