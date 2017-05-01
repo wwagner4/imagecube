@@ -72,7 +72,19 @@ object Imagecube {
     )
   }
 
-  def linCompress[T](in: Seq[T], n: Int, f: Seq[T] => T): Seq[T] = {
+  def colorMix(colors: Seq[Int]): Int = {
+    case class Rgb(r: Int, g: Int, b: Int)
+    def rgb(col: Int): Rgb = {
+      Rgb((col & 0xff0000) >> 16, (col & 0xff00) >> 8, col & 0xff)
+    }
+    val size = colors.size
+    val rgbs = colors.map(rgb)
+    val sum = rgbs.foldLeft(Rgb(0, 0, 0))((a, b) => Rgb(a.r + b.r, a.g + b.g, a.b + b.b))
+    val mean = Rgb(sum.r / size, sum.g / size, sum.b / size)
+    255 << 24 | mean.r << 16 | mean.g << 8 | mean.b
+  }
+
+  def linearCompress[T](in: Seq[T], n: Int, f: Seq[T] => T): Seq[T] = {
 
     def diff(s: Stream[Int]): Stream[Int] = {
       s.zip(s.tail).map { case (a, b) => b - a }

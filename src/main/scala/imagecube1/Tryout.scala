@@ -1,5 +1,6 @@
 package imagecube1
 
+import java.awt.Color
 import java.io.File
 
 
@@ -18,7 +19,89 @@ object Tryout extends App {
   // transform()
   // runFibs()
   // diffs()
-  compress()
+  // compress()
+  // mean()
+  rgb()
+
+  def rgb(): Unit = {
+
+    import Imagecube._
+
+    val colors = List(
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.BLUE,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED,
+      Color.RED
+    )
+
+    val ints = colors.map(_.getRGB)
+
+    val re = colorMix(ints)
+
+    println(re)
+    val c = new Color(re)
+    println(c)
+    println(Color.RED.getRGB)
+
+  }
+
+  def mean(): Unit = {
+
+    def m(a: Double, b: Double) = (a + b) / 2
+
+    val y1 = m(m(1, 2), 3)
+    val y2 = m(m(1, 3), 2)
+    val y3 = m(m(3, 2), 1)
+
+    println(y1)
+    println(y2)
+    println(y3)
+  }
 
   def transform(): Unit = {
 
@@ -50,7 +133,7 @@ object Tryout extends App {
 
     val in = List(1, 2, 3, 4, 2, 22, 23, 3, 24, 25, 72, 2, 2, 2, 2, 2, 2, 4, 2).map(_.toDouble)
 
-    (1 to in.size).foreach(n => println(linCompress(in, n, mean).mkString(", ")))
+    (1 to in.size).foreach(n => println(linearCompress(in, n, mean).mkString(", ")))
 
   }
 
