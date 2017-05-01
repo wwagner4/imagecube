@@ -40,17 +40,17 @@ object Tryout extends App {
 
     println(s"img left size ${img.left.size}")
 
-    val newRows = img.left.map { row =>
+    val newRows = img.left.zipWithIndex.map { case (row, i) =>
       val n = img.left.size
-      val (from, to) = shortenA(row.i, n)
-      val filteredCol = row.pixs.filter(p => p.i >= from && p.i < to).map { p => p.col }
-      val compressedCols = linearCompress(filteredCol, n, colorMix)
-      val newPixs = compressedCols.zipWithIndex.map { case (col, i) => Pix(i, col) }
-      Row(row.i, newPixs)
+      val (from, to) = shortenA(i, n)
+      val filteredCol = row.zipWithIndex
+        .filter { case (_, i) => i >= from && i < to }
+        .map { case (c, _) => c }
+      linearCompress(filteredCol, n, colorMix)
     }
 
     println(s"newRows size: ${newRows.size}")
-    println(s"newRows cols sizes: ${newRows.map(r => r.pixs.size).mkString(",")}")
+    println(s"newRows cols sizes: ${newRows.map(r => r.size).mkString(",")}")
 
 
   }

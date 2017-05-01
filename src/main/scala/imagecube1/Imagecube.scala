@@ -4,17 +4,12 @@ import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
 
-case class Pix(i: Int, col: Int)
-
-case class Row(i: Int, pixs: Seq[Pix])
-
-
 case class Img(
-                center: Seq[Row],
-                left: Seq[Row],
-                right: Seq[Row],
-                top: Seq[Row],
-                bottom: Seq[Row]
+                center: Seq[Seq[Int]],
+                left: Seq[Seq[Int]],
+                right: Seq[Seq[Int]],
+                top: Seq[Seq[Int]],
+                bottom: Seq[Seq[Int]]
               )
 
 object Imagecube {
@@ -22,34 +17,32 @@ object Imagecube {
 
   def readImage(file: File): Img = {
 
-    def readImage(bi: BufferedImage, x: Range, y: Range): Seq[Row] = {
+    def readImage(bi: BufferedImage, x: Range, y: Range): Seq[Seq[Int]] = {
       println(s"readImage $x $y")
 
-      def readRow(j: Int, r: Range): Seq[Pix] = {
+      def readRow(j: Int, r: Range): Seq[Int] = {
         for (i <- r.from to r.to) yield {
-          val c = bi.getRGB(i, j)
-          Pix(i, c)
+          bi.getRGB(i, j)
         }
       }
 
       for (j <- y.from to y.to) yield {
-        Row(j, readRow(j, x))
+        readRow(j, x)
       }
     }
 
 
-    def readImageTransp(bi: BufferedImage, x: Range, y: Range): Seq[Row] = {
+    def readImageTransp(bi: BufferedImage, x: Range, y: Range): Seq[Seq[Int]] = {
       println(s"readImageTransp $x $y")
 
-      def readRow(j: Int, r: Range): Seq[Pix] = {
+      def readRow(j: Int, r: Range): Seq[Int] = {
         for (i <- r.to to r.from) yield {
-          val c = bi.getRGB(j, i)
-          Pix(i, c)
+          bi.getRGB(j, i)
         }
       }
 
       for (j <- y.from to y.to) yield {
-        Row(j, readRow(j, x))
+        readRow(j, x)
       }
     }
 
