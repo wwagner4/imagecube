@@ -72,6 +72,33 @@ object Imagecube {
     )
   }
 
+  def linCompress[T](in: Seq[T], n: Int, f: Seq[T] => T): Seq[T] = {
+
+    def diff(s: Stream[Int]): Stream[Int] = {
+      s.zip(s.tail).map { case (a, b) => b - a }
+    }
+
+    def process(in: Seq[T], diffs: Stream[Int]): Seq[T] = {
+      if (in == Nil) Nil
+      else {
+        val diff = diffs.head
+        val (elems, rest) = in.splitAt(diff)
+        f(elems) +: process(rest, diffs.tail)
+      }
+    }
+
+    require(in.size >= n, s"size of 'in' (${in.size}) must be greater than 'n' ($n)")
+    if (in.size == n) in
+    else {
+      val v = in.size.toDouble / n
+      val borders = Stream.iterate(0.0)(x => x + v).map(x => x.round.toInt)
+      val diffs = diff(borders)
+      process(in, diffs)
+    }
+  }
+
+
+
 
   def transposeParamsLeft(w: Int, h: Int, p: CutParams): (Range, Range) = {
     val x = Range(p.y3.to, p.y1.from)
