@@ -24,7 +24,7 @@ object Tryout extends App {
     import ImagecubeUtil._
 
 
-    val fName = "big1.jpg"
+    val fName = "smell.jpg"
     val f = new File(dir, fName)
     val img = readImage(f)
     println(s"created img for $fName")
@@ -39,7 +39,7 @@ object Tryout extends App {
         .map { case (c, _) => c }
       linearCompress(filteredCol, n / 2, colorMix)
     }
-    println(s"newRowsA size: ${newRowsA.size}")
+    // println(s"newRowsA size: ${newRowsA.size}")
     // println(s"newRowsA cols sizes: ${newRowsA.map(r => r.size).mkString(",")}")
 
     val newRowsB = img.left.zipWithIndex.map { case (row, i) =>
@@ -51,10 +51,14 @@ object Tryout extends App {
       val m = if (n % 2 == 0) n / 2 else (n / 2 + 1)
       linearCompress(filteredCol, m, colorMix)
     }
-    println(s"newRowsB size: ${newRowsB.size}")
+    // println(s"newRowsB size: ${newRowsB.size}")
     // println(s"newRowsB cols sizes: ${newRowsB.map(r => r.size).mkString(",")}")
-
-
+    
+    val newImg = newRowsA.zip(newRowsB).map { case (a, b) => a ++ b}
+    println(s"newImg Class ${newImg.getClass}")
+    println(s"newImg size ${newImg.size}")
+    println(s"newImg sizes ${newImg.map(r => r.size).mkString(",").take(200)}")
+    
   }
 
   def shorten(): Unit = {
