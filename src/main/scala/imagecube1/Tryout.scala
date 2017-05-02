@@ -6,14 +6,6 @@ import java.io.File
 
 object Tryout extends App {
 
-  def dir: File = new File("src/main/resources")
-
-  def tmpdir: File = {
-    val re = new File("target/tmp")
-    if (!re.exists()) re.mkdirs()
-    re
-  }
-
   // readFile()
   // createCutParams()
   // transform()
@@ -32,7 +24,7 @@ object Tryout extends App {
     import ImagecubeUtil._
 
 
-    val fName = "tiny.jpg"
+    val fName = "smell.jpg"
     val f = new File(dir, fName)
     val img = readImage(f)
     println(img)
@@ -43,25 +35,22 @@ object Tryout extends App {
     val newRowsA = img.left.zipWithIndex.map { case (row, i) =>
       val n = img.left.size
       val (from, to) = shortenA(i, n)
-      println(s"## $n $i ($from - $to)")
       val filteredCol = row.zipWithIndex
-        .filter { case (_, i) => i >= from && i < to }
+        .filter { case (_, ir) => ir >= from && ir <= to }
         .map { case (c, _) => c }
-      linearCompress(filteredCol, n, colorMix)
+      linearCompress(filteredCol, n / 2, colorMix)
     }
+    println(s"newRowsA size: ${newRowsA.size}")
+    println(s"newRowsA cols sizes: ${newRowsA.map(r => r.size).mkString(",")}")
 
     val newRowsB = img.left.zipWithIndex.map { case (row, i) =>
       val n = img.left.size
       val (from, to) = shortenB(i, n)
-      println(s"## $n $i ($from - $to)")
       val filteredCol = row.zipWithIndex
-        .filter { case (_, i) => i >= from && i < to }
+        .filter { case (_, ir) => ir >= from && ir <= to }
         .map { case (c, _) => c }
-      linearCompress(filteredCol, n, colorMix)
+      linearCompress(filteredCol, n / 2, colorMix)
     }
-
-    println(s"newRowsA size: ${newRowsA.size}")
-    println(s"newRowsA cols sizes: ${newRowsA.map(r => r.size).mkString(",")}")
     println(s"newRowsB size: ${newRowsB.size}")
     println(s"newRowsB cols sizes: ${newRowsB.map(r => r.size).mkString(",")}")
 
@@ -78,7 +67,9 @@ object Tryout extends App {
     is.foreach { i =>
       val (fa, ta) = shortenA(i, n)
       val (fb, tb) = shortenB(i, n)
-      println(f"$i%3d : $fa%3d - $ta%3d : $fb%3d - $tb%3d")
+      val la = ta - fa
+      val lb = tb - fb
+      println(f"shorten   $n%3d $i%3d : $fa%3d - $ta%3d ($la%3d) : $fb%3d - $tb%3d ($lb%3d)")
     }
   }
 
@@ -235,5 +226,16 @@ object Tryout extends App {
     println(s"created img for $fName")
     println(s"img: $img")
   }
+
+
+  def dir: File = new File("src/main/resources")
+
+  def tmpdir: File = {
+    val re = new File("target/tmp")
+    if (!re.exists()) re.mkdirs()
+    re
+  }
+
+
 
 }
