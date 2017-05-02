@@ -28,7 +28,41 @@ case class CutParams(
                       y3: Range
                     )
 
+case class Pos(
+                x: Int,
+                y: Int
+              )
+
+case class PartsPositions(
+                           center: Pos,
+                           left: Pos,
+                           right: Pos,
+                           top: Pos,
+                           bottom: Pos
+                         )
+
+case class Size(
+                 w: Int,
+                 h: Int
+               )
+
 object Imagecube {
+
+  def imageSize(partLen: Int, border: Int): Size = {
+    Size(
+      2 * border + 3 * partLen,
+      2 * border + 4 * partLen
+    )
+  }
+
+  def partPositions(partLen: Int, border: Int): PartsPositions = {
+    val center = Pos(border + partLen, border + partLen)
+    val left = Pos(border, border + partLen)
+    val right = Pos(border + 2 * partLen, border + partLen)
+    val top = Pos(border + partLen, border)
+    val bottom = Pos(border + partLen, border + 2 * partLen)
+    PartsPositions(center, left, right, top, bottom)
+  }
 
   def readImage(file: File): Img = {
 
