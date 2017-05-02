@@ -21,27 +21,26 @@ object Tryout extends App {
   def shorten1(): Unit = {
 
     import Imagecube._
-    import ImagecubeUtil._
 
 
-    def printlnNewImg(img: Seq[Seq[Int]], desc: String): Unit = {
-      println(s"$desc size ${img.size}")
-      println(s"$desc sizes ${img.map(r => r.size).mkString(",").take(200)}")
-    }  
-    
-
-    val fName = "smell.jpg"
+    val fName = "cow.jpg"
     val f = new File(dir, fName)
     val img = readImage(f)
+
     println(s"created img for $fName")
 
-    println(s"img left size ${img.left.size}")
+    def shortenImg(img: Img): Img = {
+      Img(
+        img.center,
+        shortenImagePart(img.left),
+        shortenImagePart(img.right),
+        shortenImagePart(img.top),
+        shortenImagePart(img.bottom)
+      )
+    }
 
-    printlnNewImg(shortenImagePart(img.left), "left")
-    printlnNewImg(shortenImagePart(img.right), "right")
-    printlnNewImg(shortenImagePart(img.top), "top")
-    printlnNewImg(shortenImagePart(img.bottom), "bottom")
-    
+    val shortImg = shortenImg(img)
+    println(s"shorted image from $fName - n:${shortImg.center.size}")
   }
 
   def shorten(): Unit = {

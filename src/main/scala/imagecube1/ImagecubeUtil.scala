@@ -2,7 +2,7 @@ package imagecube1
 
 case class Range(from: Int, to: Int)
 
-case class CutParams(x1: Range, x2: Range, x3: Range, y1: Range, y2: Range, y3: Range)
+case class CutParams(partLen: Int, x1: Range, x2: Range, x3: Range, y1: Range, y2: Range, y3: Range)
 
 object ImagecubeUtil {
 
@@ -25,6 +25,7 @@ object ImagecubeUtil {
       val off1 = (w - h1) / 2
       val step = h1 / 3
       CutParams(
+        step,
         Range(off1, off1 + step - 1),
         Range(off1 + step, off1 + (2 * step) - 1),
         Range(off1 + (2 * step), off1 + (3 * step) - 1),
@@ -35,7 +36,7 @@ object ImagecubeUtil {
     }
 
     def transpose(p: CutParams): CutParams = {
-      CutParams(p.y1, p.y2, p.y3, p.x1, p.x2, p.x3)
+      CutParams(p.partLen, p.y1, p.y2, p.y3, p.x1, p.x2, p.x3)
     }
 
     if (width >= height) cutParamsPort(width, height)
