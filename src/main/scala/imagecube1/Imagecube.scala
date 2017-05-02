@@ -31,7 +31,7 @@ object Imagecube {
         val filteredCol = row.zipWithIndex
           .filter { case (_, ir) => ir >= from && ir <= to }
           .map { case (c, _) => c }
-        val m = if (n % 2 == 0) n / 2 else (n / 2 + 1)
+        val m = if (n % 2 == 0) n / 2 else n / 2 + 1
         linearCompress(filteredCol, m, colorMix)
       }
       newRowsA.zip(newRowsB).map { case (a, b) => a ++ b}
