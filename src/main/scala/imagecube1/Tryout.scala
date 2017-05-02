@@ -23,41 +23,44 @@ object Tryout extends App {
     import Imagecube._
     import ImagecubeUtil._
 
+    def shortenImagePart(part: Seq[Seq[Int]]):  Seq[Seq[Int]] = {
+      val newRowsA = part.zipWithIndex.map { case (row, i) =>
+        val n = part.size
+        val (from, to) = shortenA(i, n)
+        val filteredCol = row.zipWithIndex
+          .filter { case (_, ir) => ir >= from && ir <= to }
+          .map { case (c, _) => c }
+        linearCompress(filteredCol, n / 2, colorMix)
+      }
+      val newRowsB = part.zipWithIndex.map { case (row, i) =>
+        val n = part.size
+        val (from, to) = shortenB(i, n)
+        val filteredCol = row.zipWithIndex
+          .filter { case (_, ir) => ir >= from && ir <= to }
+          .map { case (c, _) => c }
+        val m = if (n % 2 == 0) n / 2 else (n / 2 + 1)
+        linearCompress(filteredCol, m, colorMix)
+      }
+      newRowsA.zip(newRowsB).map { case (a, b) => a ++ b}
+    }
 
-    val fName = "smell.jpg"
+    def printlnNewImg(img: Seq[Seq[Int]], desc: String): Unit = {
+      println(s"$desc size ${img.size}")
+      println(s"$desc sizes ${img.map(r => r.size).mkString(",").take(200)}")
+    }  
+    
+
+    val fName = "big.jpg"
     val f = new File(dir, fName)
     val img = readImage(f)
     println(s"created img for $fName")
 
     println(s"img left size ${img.left.size}")
 
-    val newRowsA = img.left.zipWithIndex.map { case (row, i) =>
-      val n = img.left.size
-      val (from, to) = shortenA(i, n)
-      val filteredCol = row.zipWithIndex
-        .filter { case (_, ir) => ir >= from && ir <= to }
-        .map { case (c, _) => c }
-      linearCompress(filteredCol, n / 2, colorMix)
-    }
-    // println(s"newRowsA size: ${newRowsA.size}")
-    // println(s"newRowsA cols sizes: ${newRowsA.map(r => r.size).mkString(",")}")
-
-    val newRowsB = img.left.zipWithIndex.map { case (row, i) =>
-      val n = img.left.size
-      val (from, to) = shortenB(i, n)
-      val filteredCol = row.zipWithIndex
-        .filter { case (_, ir) => ir >= from && ir <= to }
-        .map { case (c, _) => c }
-      val m = if (n % 2 == 0) n / 2 else (n / 2 + 1)
-      linearCompress(filteredCol, m, colorMix)
-    }
-    // println(s"newRowsB size: ${newRowsB.size}")
-    // println(s"newRowsB cols sizes: ${newRowsB.map(r => r.size).mkString(",")}")
-    
-    val newImg = newRowsA.zip(newRowsB).map { case (a, b) => a ++ b}
-    println(s"newImg Class ${newImg.getClass}")
-    println(s"newImg size ${newImg.size}")
-    println(s"newImg sizes ${newImg.map(r => r.size).mkString(",").take(200)}")
+    printlnNewImg(shortenImagePart(img.left), "left")
+    printlnNewImg(shortenImagePart(img.right), "right")
+    printlnNewImg(shortenImagePart(img.top), "top")
+    printlnNewImg(shortenImagePart(img.bottom), "bottom")
     
   }
 
