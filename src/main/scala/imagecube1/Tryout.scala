@@ -24,10 +24,9 @@ object Tryout extends App {
     import ImagecubeUtil._
 
 
-    val fName = "smell.jpg"
+    val fName = "big1.jpg"
     val f = new File(dir, fName)
     val img = readImage(f)
-    println(img)
     println(s"created img for $fName")
 
     println(s"img left size ${img.left.size}")
@@ -41,7 +40,7 @@ object Tryout extends App {
       linearCompress(filteredCol, n / 2, colorMix)
     }
     println(s"newRowsA size: ${newRowsA.size}")
-    println(s"newRowsA cols sizes: ${newRowsA.map(r => r.size).mkString(",")}")
+    // println(s"newRowsA cols sizes: ${newRowsA.map(r => r.size).mkString(",")}")
 
     val newRowsB = img.left.zipWithIndex.map { case (row, i) =>
       val n = img.left.size
@@ -49,10 +48,11 @@ object Tryout extends App {
       val filteredCol = row.zipWithIndex
         .filter { case (_, ir) => ir >= from && ir <= to }
         .map { case (c, _) => c }
-      linearCompress(filteredCol, n / 2, colorMix)
+      val m = if (n % 2 == 0) n / 2 else (n / 2 + 1)
+      linearCompress(filteredCol, m, colorMix)
     }
     println(s"newRowsB size: ${newRowsB.size}")
-    println(s"newRowsB cols sizes: ${newRowsB.map(r => r.size).mkString(",")}")
+    // println(s"newRowsB cols sizes: ${newRowsB.map(r => r.size).mkString(",")}")
 
 
   }
