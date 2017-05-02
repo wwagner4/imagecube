@@ -5,6 +5,7 @@ import java.io.File
 import javax.imageio.ImageIO
 
 case class Img(
+                partLen: Int,
                 center: Seq[Seq[Int]],
                 left: Seq[Seq[Int]],
                 right: Seq[Seq[Int]],
@@ -13,29 +14,8 @@ case class Img(
               )
 
 object Imagecube {
-  
+
   import ImagecubeUtil._
-  
-   def shortenImagePart(part: Seq[Seq[Int]]):  Seq[Seq[Int]] = {
-      val newRowsA = part.zipWithIndex.map { case (row, i) =>
-        val n = part.size
-        val (from, to) = shortenA(i, n)
-        val filteredCol = row.zipWithIndex
-          .filter { case (_, ir) => ir >= from && ir <= to }
-          .map { case (c, _) => c }
-        linearCompress(filteredCol, n / 2, colorMix)
-      }
-      val newRowsB = part.zipWithIndex.map { case (row, i) =>
-        val n = part.size
-        val (from, to) = shortenB(i, n)
-        val filteredCol = row.zipWithIndex
-          .filter { case (_, ir) => ir >= from && ir <= to }
-          .map { case (c, _) => c }
-        val m = if (n % 2 == 0) n / 2 else n / 2 + 1
-        linearCompress(filteredCol, m, colorMix)
-      }
-      newRowsA.zip(newRowsB).map { case (a, b) => a ++ b}
-    }
 
   def readImage(file: File): Img = {
 
@@ -77,11 +57,23 @@ object Imagecube {
     val (xrLeft, yrLeft) = ImagecubeUtil.transposeParamsLeft(p)
     val (xrRight, yrRight) = ImagecubeUtil.transposeParamsRight(p)
     Img(
+      partLen = p.partLen,
       center = readImage(bi, p.x2, p.y2),
       left = readImageTransp(bi, xrLeft, yrLeft),
       right = readImageTransp(bi, xrRight, yrRight),
       top = readImage(bi, Range(p.x1.from, p.x3.to), p.y1),
       bottom = readImage(bi, Range(p.x1.from, p.x3.to), p.y3)
+    )
+  }
+
+  def shortenImg(img: Img): Img = {
+    Img(
+      img.partLen,
+      img.center,
+      shortenImagePart(img.left),
+      shortenImagePart(img.right),
+      shortenImagePart(img.top),
+      shortenImagePart(img.bottom)
     )
   }
 

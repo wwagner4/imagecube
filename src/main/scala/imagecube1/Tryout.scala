@@ -22,25 +22,14 @@ object Tryout extends App {
 
     import Imagecube._
 
-
     val fName = "cow.jpg"
     val f = new File(dir, fName)
     val img = readImage(f)
 
     println(s"created img for $fName")
 
-    def shortenImg(img: Img): Img = {
-      Img(
-        img.center,
-        shortenImagePart(img.left),
-        shortenImagePart(img.right),
-        shortenImagePart(img.top),
-        shortenImagePart(img.bottom)
-      )
-    }
-
     val shortImg = shortenImg(img)
-    println(s"shorted image from $fName - n:${shortImg.center.size}")
+    println(s"shorted image from $fName - partLen: ${shortImg.partLen}")
   }
 
   def shorten(): Unit = {

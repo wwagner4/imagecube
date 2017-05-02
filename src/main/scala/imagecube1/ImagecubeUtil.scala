@@ -1,5 +1,7 @@
 package imagecube1
 
+import imagecube1.Imagecube.{colorMix, linearCompress}
+
 case class Range(from: Int, to: Int)
 
 case class CutParams(partLen: Int, x1: Range, x2: Range, x3: Range, y1: Range, y2: Range, y3: Range)
@@ -42,6 +44,28 @@ object ImagecubeUtil {
     if (width >= height) cutParamsPort(width, height)
     else transpose(cutParams(height, width))
   }
+
+  def shortenImagePart(part: Seq[Seq[Int]]): Seq[Seq[Int]] = {
+    val newRowsA = part.zipWithIndex.map { case (row, i) =>
+      val n = part.size
+      val (from, to) = shortenA(i, n)
+      val filteredCol = row.zipWithIndex
+        .filter { case (_, ir) => ir >= from && ir <= to }
+        .map { case (c, _) => c }
+      linearCompress(filteredCol, n / 2, colorMix)
+    }
+    val newRowsB = part.zipWithIndex.map { case (row, i) =>
+      val n = part.size
+      val (from, to) = shortenB(i, n)
+      val filteredCol = row.zipWithIndex
+        .filter { case (_, ir) => ir >= from && ir <= to }
+        .map { case (c, _) => c }
+      val m = if (n % 2 == 0) n / 2 else n / 2 + 1
+      linearCompress(filteredCol, m, colorMix)
+    }
+    newRowsA.zip(newRowsB).map { case (a, b) => a ++ b }
+  }
+
 
   def shortenA(i: Int, n: Int): (Int, Int) = {
     val a = (3.0 * n / 2.0).round.toInt
