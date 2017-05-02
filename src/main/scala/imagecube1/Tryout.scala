@@ -3,6 +3,8 @@ package imagecube1
 import java.awt.Color
 import java.io.File
 
+import Imagecube._
+
 
 object Tryout extends App {
 
@@ -63,8 +65,6 @@ object Tryout extends App {
 
   def shorten1(): Unit = {
 
-    import Imagecube._
-
     val fName = "cow.jpg"
     val f = new File(dir, fName)
     val img = readImage(f)
@@ -76,8 +76,6 @@ object Tryout extends App {
   }
 
   def shorten(): Unit = {
-
-    import ImagecubeUtil._
 
     val n = 10
 
@@ -92,8 +90,6 @@ object Tryout extends App {
   }
 
   def rgb(): Unit = {
-
-    import Imagecube._
 
     val colors = List(
       Color.RED,
@@ -195,8 +191,6 @@ object Tryout extends App {
 
   def compress(): Unit = {
 
-    import Imagecube._
-
     def mean(in: Seq[Double]): Double = in.sum / in.size
 
     val in = List(1, 2, 3, 4, 2, 22, 23, 3, 24, 25, 72, 2, 2, 2, 2, 2, 2, 4, 2).map(_.toDouble)
@@ -232,12 +226,11 @@ object Tryout extends App {
     )
 
     whs.foreach {
-      case (w, h) => println(s"($w, $h, ${ImagecubeUtil.cutParams(w, h)}, (Range(0, 0), Range(0, 0))),")
+      case (w, h) => println(s"($w, $h, ${cutParams(w, h)}, (Range(0, 0), Range(0, 0))),")
     }
   }
 
   def readFile(): Unit = {
-    import Imagecube._
     val fName = "tiny1.jpg"
     val f = new File(dir, fName)
     val img = readImage(f).toString.take(100) + " ..."
