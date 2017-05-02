@@ -1,7 +1,9 @@
 package imagecube1
 
 import java.awt.Color
+import java.awt.image.BufferedImage
 import java.io.File
+import javax.imageio.ImageIO
 
 import Imagecube._
 
@@ -18,7 +20,50 @@ object Tryout extends App {
   // rgb()
   // shorten()
   // shorten1()
-  positionParts()
+  // positionParts()
+  writeImage()
+
+  def writeImage(): Unit ={
+
+    def writeImage(img: Img, border: Int): BufferedImage = {
+
+      def writeImagePart(bi: BufferedImage, imgPart: Seq[Seq[Int]], pos: Pos): Unit = {
+        imgPart.zipWithIndex.foreach{
+          case (row, i) => row.zipWithIndex.foreach{
+            case (col, j) => bi.setRGB(pos.x + j, pos.y + i, col)
+          }
+        }
+      }
+
+      val size = imageSize(img.partLen, border)
+      val bi = new BufferedImage(size.w, size.h, BufferedImage.TYPE_INT_RGB)
+      val pos = partPositions(img.partLen, border)
+
+      writeImagePart(bi, img.center, pos.center)
+      writeImagePart(bi, img.left, pos.left)
+      writeImagePart(bi, img.right, pos.right)
+      writeImagePart(bi, img.top, pos.top)
+      writeImagePart(bi, img.bottom, pos.bottom)
+
+      bi
+
+    }
+
+    val fName = "big.jpg"
+    val f = new File(dir, fName)
+    val img = readImage(f)
+
+    println(s"created img for $fName")
+
+    val shortImg = shortenImg(img)
+
+    val bi = writeImage(shortImg, 5)
+
+    val outFile = new File(tmpdir, "out.jpg")
+    ImageIO.write(bi, "JPG", outFile)
+
+    println(s"wrote image to $outFile")
+  }
 
   def positionParts(): Unit = {
 
