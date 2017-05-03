@@ -22,7 +22,24 @@ object Tryout extends App {
   // parallel()
   // perc()
   // runExtractName()
-  runWriteImage()
+  // runWriteImage()
+  runDir()
+
+  def runDir(): Unit = {
+
+
+    val inDir = new File("/Users/wwagner4/tmp/cubes/in")
+    val outDir = new File("/Users/wwagner4/tmp/cubes/out")
+    outDir.mkdirs()
+
+    val files = inDir.listFiles()
+
+
+    files.foreach{ f =>
+      writeImage(f, outDir)
+    }
+    println("FINISHED")
+  }
 
   def runWriteImage(): Unit = {
 
@@ -46,7 +63,7 @@ object Tryout extends App {
     val stopTime = System.currentTimeMillis()
     println(s"time: ${stopTime - startTime}")
   }
-  
+
   def runExtractName(): Unit = {
     Seq(
       new File("a/b/c.png"),
