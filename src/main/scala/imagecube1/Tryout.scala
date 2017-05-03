@@ -25,43 +25,15 @@ object Tryout extends App {
 
   def writeImage(): Unit = {
 
-    def writeImage(img: Img, border: Int): BufferedImage = {
-
-      def writeImagePart(bi: BufferedImage, imgPart: Seq[Seq[Int]], pos: Pos): Unit = {
-        imgPart.zipWithIndex.foreach {
-          case (row, i) => row.zipWithIndex.foreach {
-            case (col, j) => bi.setRGB(pos.x + j, pos.y + i, col)
-          }
-        }
-      }
-
-      def writeImagePartTransp(bi: BufferedImage, imgPart: Seq[Seq[Int]], pos: Pos): Unit = {
-        imgPart.zipWithIndex.foreach {
-          case (row, i) => row.zipWithIndex.foreach {
-            case (col, j) => bi.setRGB(pos.x + i, pos.y + j, col)
-          }
-        }
-      }
-
-      val size = imageSize(img.partLen, border)
-      val bi = new BufferedImage(size.w, size.h, BufferedImage.TYPE_INT_RGB)
-      val pos = partPositions(img.partLen, border)
-
-      writeImagePart(bi, img.center, pos.center)
-      writeImagePartTransp(bi, img.left, pos.left)
-      writeImagePartTransp(bi, img.right, pos.right)
-      writeImagePart(bi, img.top, pos.top)
-      writeImagePart(bi, img.bottom, pos.bottom)
-
-      bi
-
-    }
-
-    val names = List(
+    val names1 = List(
       "cow",
       "cow1",
       "big",
       "big1"
+    )
+
+    val names = List(
+      "cow"
     )
 
     val startTime = System.currentTimeMillis()
@@ -75,7 +47,7 @@ object Tryout extends App {
 
       val shortImg = shortenImg(img)
 
-      val bi = writeImage(shortImg, 5)
+      val bi = createImage(shortImg, 5)
 
       val outFile = new File(tmpdir, fOutName)
       val typ = imageType(outFile)
