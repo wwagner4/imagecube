@@ -23,20 +23,24 @@ object Tryout extends App {
   // positionParts()
   // parallel()
   // perc()
-  //runExtractName()
+  // runExtractName()
   runWriteImage()
-  
+
   def runWriteImage(): Unit = {
 
-    val names = List(
+    val namesAll = List(
       "cow",
       "cow1",
       "big",
       "big1"
     )
 
+    val namesOne = List(
+      "cow"
+    )
+
     val startTime = System.currentTimeMillis()
-    names.par.foreach{ name =>
+    namesOne.par.foreach{ name =>
       val fName = s"$name.jpg"
       val f = new File(dir, fName)
       writeImage(f, tmpdir)

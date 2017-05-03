@@ -1,9 +1,11 @@
 package imagecube1
 
-import java.awt.{Color, Graphics2D}
+import java.awt.{Color, Graphics2D, Stroke}
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
+
+import sun.util.resources.cldr.aa.CalendarData_aa_DJ
 
 case class Img(
                 partLen: Int,
@@ -48,21 +50,21 @@ case class Size(
                )
 
 object Imagecube {
-  
-def writeImage(f: File, outDir: File): Unit = {
-  try {
-    val img = readImage(f)
-    val shortImg = shortenImgPar(img)
-    val bi = createImage(shortImg, percent(img.partLen, 50))
-    val fOutName = s"${extractName(f)}_out.png"
-    val outFile = new File(outDir, fOutName)
-    val typ = imageType(outFile)
-    ImageIO.write(bi, typ, outFile)
-    println(s"wrote image to $outFile type: $typ")
-  } catch {
-    case e: Exception => println(s"ERROR: Could not convert image ${f.getName} because $e")
+
+  def writeImage(f: File, outDir: File): Unit = {
+    try {
+      val img = readImage(f)
+      val shortImg = shortenImgPar(img)
+      val bi = createImage(shortImg, percent(img.partLen, 50))
+      val fOutName = s"${extractName(f)}_out.png"
+      val outFile = new File(outDir, fOutName)
+      val typ = imageType(outFile)
+      ImageIO.write(bi, typ, outFile)
+      println(s"wrote image to $outFile type: $typ")
+    } catch {
+      case e: Exception => println(s"ERROR: Could not convert image ${f.getName} because $e")
+    }
   }
-}
 
   def imageSize(partLen: Int, border: Int): Size = {
     Size(
@@ -144,11 +146,19 @@ def writeImage(f: File, outDir: File): Unit = {
     import ExecutionContext.Implicits.global
     import scala.concurrent.duration._
 
-    val fLeft = Future {shortenImagePartPar(img.left)}
-    val fRight = Future {shortenImagePartPar(img.right.reverse).reverse}
-    val fTop = Future {shortenImagePartPar(img.top)}
-    val fBottom = Future {shortenImagePartPar(img.bottom.reverse).reverse}
-    val r = for(rLeft <- fLeft; rRight <- fRight; rTop <- fTop; rBottom <- fBottom) 
+    val fLeft = Future {
+      shortenImagePartPar(img.left)
+    }
+    val fRight = Future {
+      shortenImagePartPar(img.right.reverse).reverse
+    }
+    val fTop = Future {
+      shortenImagePartPar(img.top)
+    }
+    val fBottom = Future {
+      shortenImagePartPar(img.bottom.reverse).reverse
+    }
+    val r = for (rLeft <- fLeft; rRight <- fRight; rTop <- fTop; rBottom <- fBottom)
       yield (rLeft, rRight, rTop, rBottom)
     val (left, right, top, bottom) = Await.result(r, Duration(20, SECONDS))
     Img(
@@ -236,14 +246,18 @@ def writeImage(f: File, outDir: File): Unit = {
     val newRowsB = shortenRowsB(part)
     newRowsA.zip(newRowsB).map { case (a, b) => a ++ b }
   }
-  
+
   def shortenImagePartPar(part: Seq[Seq[Int]]): Seq[Seq[Int]] = {
     import scala.concurrent._
     import ExecutionContext.Implicits.global
     import scala.concurrent.duration._
 
-    val fRowsA = Future { shortenRowsA(part) }
-    val fRowsB = Future { shortenRowsB(part) }
+    val fRowsA = Future {
+      shortenRowsA(part)
+    }
+    val fRowsB = Future {
+      shortenRowsB(part)
+    }
     val r = for (rRowsA <- fRowsA; rRowsB <- fRowsB) yield (rRowsA, rRowsB)
     val (newRowsA, newRowsB) = Await.result(r, Duration(10, SECONDS))
     newRowsA.zip(newRowsB).map { case (a, b) => a ++ b }
@@ -259,7 +273,7 @@ def writeImage(f: File, outDir: File): Unit = {
       linearCompress(filteredCol, n / 2, colorMix)
     }
   }
-  
+
   def shortenRowsB(part: Seq[Seq[Int]]): Seq[Seq[Int]] = {
     part.zipWithIndex.map { case (row, i) =>
       val n = part.size
@@ -271,7 +285,7 @@ def writeImage(f: File, outDir: File): Unit = {
       linearCompress(filteredCol, m, colorMix)
     }
   }
-  
+
   def shortenA(i: Int, n: Int): (Int, Int) = {
     val a = (3.0 * n / 2.0).round.toInt
     val from = i
@@ -326,6 +340,24 @@ def writeImage(f: File, outDir: File): Unit = {
       g.fillRect(0, 0, w, h)
     }
 
+    def writeLines(bi: BufferedImage, l: Int, b: Int, f: Int): Unit = {
+
+      case class P(x: Int, y: Int) {
+        def add(p: P) = P(x + p.x, y + p.y)
+      }
+
+      def drawPoli(g: Graphics2D, poli: Seq[P]): Unit = {
+        poli.zip(poli.tail).foreach { case (f, t) =>
+          g.drawLine(f.x, f.y, t.x, t.y)
+        }
+      }
+
+      val g = bi.getGraphics.asInstanceOf[Graphics2D]
+      g.setColor(Color.BLACK)
+      val p1 = Seq(P(0, 0), P(0, l - 1), P(l - 1, l - 1), P(l - 1, 0)).map(_.add(P(b, b))).map(_.add(P(l, 3 * l)))
+      drawPoli(g, p1)
+    }
+
     val size = imageSize(img.partLen, border)
     val bi = new BufferedImage(size.w, size.h, BufferedImage.TYPE_INT_RGB)
     writeBackground(bi)
@@ -336,15 +368,19 @@ def writeImage(f: File, outDir: File): Unit = {
     writeImagePartTransp(bi, img.right, pos.right)
     writeImagePart(bi, img.top, pos.top)
     writeImagePart(bi, img.bottom, pos.bottom)
+
+    writeLines(bi, img.partLen, border, percent(img.partLen, 30))
+
     bi
   }
-  def percent(value: Int, perc: Int): Int = (value.toDouble * perc / 100.0).round.toInt   
-    
+
+  def percent(value: Int, perc: Int): Int = (value.toDouble * perc / 100.0).round.toInt
+
   def extractName(f: File): String = {
-      val i = f.getName.lastIndexOf('.')
-      if (i < 0) f.getName
-      else f.getName().substring(0, i)
-  }  
+    val i = f.getName.lastIndexOf('.')
+    if (i < 0) f.getName
+    else f.getName().substring(0, i)
+  }
 
 
 }
