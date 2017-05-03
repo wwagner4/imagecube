@@ -1,5 +1,6 @@
 package imagecube1
 
+import java.awt.{Color, Graphics2D}
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
@@ -265,8 +266,17 @@ object Imagecube {
       }
     }
 
+    def writeBackground(bi: BufferedImage): Unit = {
+      val w = bi.getWidth
+      val h = bi.getHeight
+      val g = bi.getGraphics.asInstanceOf[Graphics2D]
+      g.setBackground(Color.WHITE)
+      g.fillRect(0, 0, w, h)
+    }
+
     val size = imageSize(img.partLen, border)
     val bi = new BufferedImage(size.w, size.h, BufferedImage.TYPE_INT_RGB)
+    writeBackground(bi)
     val pos = partPositions(img.partLen, border)
 
     writeImagePart(bi, img.center, pos.center)

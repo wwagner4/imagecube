@@ -25,14 +25,14 @@ object Tryout extends App {
 
   def writeImage(): Unit = {
 
-    val names1 = List(
+    val names = List(
       "cow",
       "cow1",
       "big",
       "big1"
     )
 
-    val names = List(
+    val names1 = List(
       "cow"
     )
 
@@ -47,7 +47,7 @@ object Tryout extends App {
 
       val shortImg = shortenImg(img)
 
-      val bi = createImage(shortImg, 5)
+      val bi = createImage(shortImg, 50)
 
       val outFile = new File(tmpdir, fOutName)
       val typ = imageType(outFile)
