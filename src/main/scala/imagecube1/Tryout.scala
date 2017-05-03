@@ -65,9 +65,9 @@ object Tryout extends App {
     )
 
     val startTime = System.currentTimeMillis()
-    names.foreach{ name =>
+    names.par.foreach{ name =>
       val fName = s"$name.jpg"
-      val fOutName = s"${name}_out.jpg"
+      val fOutName = s"${name}_out.png"
       val f = new File(dir, fName)
       val img = readImage(f)
 
@@ -78,9 +78,10 @@ object Tryout extends App {
       val bi = writeImage(shortImg, 5)
 
       val outFile = new File(tmpdir, fOutName)
-      ImageIO.write(bi, "JPG", outFile)
+      val typ = imageType(outFile)
+      ImageIO.write(bi, typ, outFile)
 
-      println(s"wrote image to $outFile")
+      println(s"wrote image to $outFile type: $typ")
     }
     val stopTime = System.currentTimeMillis()
     println(s"time: ${stopTime - startTime}")

@@ -233,4 +233,18 @@ object Imagecube {
     (from, to)
   }
 
+  def imageType(file: File): String = {
+    val i = file.getName.lastIndexOf('.')
+    if (i < 0) throw new IllegalArgumentException("file must have an image extension. .png, .jpg, ...")
+    val ext = file.getName.substring(i + 1).toUpperCase
+    ext match {
+      case "JPG" => "JPEG"
+      case "PNG" => ext
+      case "BMP" => ext
+      case "WBMP" => ext
+      case "JPEG" => ext
+      case _ => throw new IllegalStateException(s"unknown image format $ext")
+    }
+  }
+
 }
