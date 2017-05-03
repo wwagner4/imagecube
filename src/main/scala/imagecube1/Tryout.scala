@@ -1,9 +1,7 @@
 package imagecube1
 
 import java.awt.Color
-import java.awt.image.BufferedImage
 import java.io.File
-import javax.imageio.ImageIO
 
 import Imagecube._
 
@@ -40,7 +38,7 @@ object Tryout extends App {
     )
 
     val startTime = System.currentTimeMillis()
-    namesOne.par.foreach{ name =>
+    namesAll.foreach{ name =>
       val fName = s"$name.jpg"
       val f = new File(dir, fName)
       writeImage(f, tmpdir)

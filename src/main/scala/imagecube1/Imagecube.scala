@@ -1,11 +1,15 @@
 package imagecube1
 
-import java.awt.{Color, Graphics2D, Stroke}
+import java.awt._
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
 
-import sun.util.resources.cldr.aa.CalendarData_aa_DJ
+import scala.concurrent._
+import ExecutionContext.Implicits.global
+import scala.concurrent.duration._
+
+
 
 case class Img(
                 partLen: Int,
@@ -55,7 +59,7 @@ object Imagecube {
     try {
       val img = readImage(f)
       val shortImg = shortenImgPar(img)
-      val bi = createImage(shortImg, percent(img.partLen, 50))
+      val bi = createImage(shortImg, percent(img.partLen, 20))
       val fOutName = s"${extractName(f)}_out.png"
       val outFile = new File(outDir, fOutName)
       val typ = imageType(outFile)
@@ -142,10 +146,6 @@ object Imagecube {
   }
 
   def shortenImgPar(img: Img): Img = {
-    import scala.concurrent._
-    import ExecutionContext.Implicits.global
-    import scala.concurrent.duration._
-
     val fLeft = Future {
       shortenImagePartPar(img.left)
     }
@@ -248,9 +248,6 @@ object Imagecube {
   }
 
   def shortenImagePartPar(part: Seq[Seq[Int]]): Seq[Seq[Int]] = {
-    import scala.concurrent._
-    import ExecutionContext.Implicits.global
-    import scala.concurrent.duration._
 
     val fRowsA = Future {
       shortenRowsA(part)
@@ -340,22 +337,64 @@ object Imagecube {
       g.fillRect(0, 0, w, h)
     }
 
-    def writeLines(bi: BufferedImage, l: Int, b: Int, f: Int): Unit = {
+    def writeLines(bi: BufferedImage, l: Int, b: Int, d: Int): Unit = {
+
+      val g = bi.getGraphics.asInstanceOf[Graphics2D]
 
       case class P(x: Int, y: Int) {
         def add(p: P) = P(x + p.x, y + p.y)
       }
 
-      def drawPoli(g: Graphics2D, poli: Seq[P]): Unit = {
+      def drawPoli(poli: Seq[P]): Unit = {
         poli.zip(poli.tail).foreach { case (f, t) =>
           g.drawLine(f.x, f.y, t.x, t.y)
         }
       }
 
-      val g = bi.getGraphics.asInstanceOf[Graphics2D]
+      def drawGround(): Unit = {
+        val p = Seq(P(0, 0), P(0, l - 1), P(l - 1, l - 1), P(l - 1, 0))
+          .map(_.add(P(b, b)))
+          .map(_.add(P(l, 3 * l)))
+        drawPoli(p)
+      }
+
+      def drawFlapVertRight(off: P): Unit = {
+        val p = Seq(P(0, 0), P(d, d), P(d, l - d), P(0, l))
+          .map(_.add(P(b, b)))
+          .map(_.add(off))
+        drawPoli(p)
+      }
+
+      def drawFlapVertLeft(off: P): Unit = {
+        val p = Seq(P(0, 0), P(-d, d), P(-d, l - d), P(0, l))
+          .map(_.add(P(b, b)))
+          .map(_.add(off))
+        drawPoli(p)
+      }
+
+      def drawFlapHorDown(off: P): Unit = {
+        val p = Seq(P(0, 0), P(d, d), P(l - d, d), P(l, 0))
+          .map(_.add(P(b, b)))
+          .map(_.add(off))
+        drawPoli(p)
+      }
+
+      def drawFlapHorUp(off: P): Unit = {
+        val p = Seq(P(0, 0), P(d, -d), P(l - d, -d), P(l, 0))
+          .map(_.add(P(b, b)))
+          .map(_.add(off))
+        drawPoli(p)
+      }
+
       g.setColor(Color.BLACK)
-      val p1 = Seq(P(0, 0), P(0, l - 1), P(l - 1, l - 1), P(l - 1, 0)).map(_.add(P(b, b))).map(_.add(P(l, 3 * l)))
-      drawPoli(g, p1)
+      drawGround()
+      drawFlapVertLeft(P(l, 0))
+      drawFlapHorDown(P(0, 2 * l))
+      drawFlapVertLeft(P(l, 3 * l))
+      drawFlapHorDown(P(l, 4 * l))
+      drawFlapVertRight(P(2 * l, 3 * l))
+      drawFlapVertRight(P(2 * l, 2 * l))
+      drawFlapHorUp(P(2 * l, l))
     }
 
     val size = imageSize(img.partLen, border)
@@ -369,7 +408,7 @@ object Imagecube {
     writeImagePart(bi, img.top, pos.top)
     writeImagePart(bi, img.bottom, pos.bottom)
 
-    writeLines(bi, img.partLen, border, percent(img.partLen, 30))
+    writeLines(bi, img.partLen, border, percent(img.partLen, 15))
 
     bi
   }
