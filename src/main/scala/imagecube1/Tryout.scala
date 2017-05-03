@@ -21,8 +21,33 @@ object Tryout extends App {
   // shorten()
   // shorten1()
   // positionParts()
-  writeImage()
+  // writeImage()
+  parallel()
 
+  def parallel(): Unit = {
+    val ran = new java.util.Random()
+        
+    def job(id: String, steps: Int): Int = {
+      println(f"JOB_$id STARTED")
+      (1 to steps).foreach { i => 
+        Thread.sleep(5 + ran.nextInt(95))
+        println(f"JOB_$id $i%3d/$steps%3d")
+      }
+      println(f"JOB_$id READY")
+      steps
+    }
+    
+    import scala.concurrent._
+    import ExecutionContext.Implicits.global
+    import scala.concurrent.duration._
+
+    val f1 = Future { job("A", 50)}
+    val f2 = Future { job("B", 10)}
+    val r: Future[(Int, Int)] = for(r1 <- f1; r2 <- f2) yield (r1, r2)
+    val (a, b): (Int, Int) = Await.result(r, Duration(10, SECONDS))
+    println(s"ready $a $b")  
+  }
+  
   def writeImage(): Unit = {
 
     val names = List(
