@@ -113,14 +113,31 @@ object Imagecube {
     )
   }
 
-  def shortenImg(img: Img): Img = {
+  def shortenImgSeq(img: Img): Img = {
     Img(
       img.partLen,
       img.center,
-      shortenImagePart(img.left),
-      shortenImagePart(img.right.reverse).reverse,
-      shortenImagePart(img.top),
-      shortenImagePart(img.bottom.reverse).reverse
+      shortenImagePartPar(img.left),
+      shortenImagePartPar(img.right.reverse).reverse,
+      shortenImagePartPar(img.top),
+      shortenImagePartPar(img.bottom.reverse).reverse
+    )
+  }
+
+  def shortenImgPar(img: Img): Img = {
+    import scala.concurrent._
+    import ExecutionContext.Implicits.global
+    import scala.concurrent.duration._
+
+    val fLeft = Future {shortenImagePartPar(img.left)}
+    val fRight = Future {shortenImagePartPar(img.right.reverse).reverse}
+    val fTop = Future {shortenImagePartPar(img.top)}
+    val fBottom = Future {shortenImagePartPar(img.bottom.reverse).reverse}
+    val r = for(rLeft <- fLeft; rRight <- fRight; rTop <- fTop; rBottom <- fBottom) 
+      yield (rLeft, rRight, rTop, rBottom)
+    val (left, right, top, bottom) = Await.result(r, Duration(20, SECONDS))
+    Img(
+      img.partLen, img.center, left, right, top, bottom
     )
   }
 
@@ -199,8 +216,26 @@ object Imagecube {
     else transpose(cutParams(height, width))
   }
 
-  def shortenImagePart(part: Seq[Seq[Int]]): Seq[Seq[Int]] = {
-    val newRowsA = part.zipWithIndex.map { case (row, i) =>
+  def shortenImagePartSeq(part: Seq[Seq[Int]]): Seq[Seq[Int]] = {
+    val newRowsA = shortenRowsA(part)
+    val newRowsB = shortenRowsB(part)
+    newRowsA.zip(newRowsB).map { case (a, b) => a ++ b }
+  }
+  
+  def shortenImagePartPar(part: Seq[Seq[Int]]): Seq[Seq[Int]] = {
+    import scala.concurrent._
+    import ExecutionContext.Implicits.global
+    import scala.concurrent.duration._
+
+    val fRowsA = Future { shortenRowsA(part) }
+    val fRowsB = Future { shortenRowsB(part) }
+    val r = for (rRowsA <- fRowsA; rRowsB <- fRowsB) yield (rRowsA, rRowsB)
+    val (newRowsA, newRowsB) = Await.result(r, Duration(10, SECONDS))
+    newRowsA.zip(newRowsB).map { case (a, b) => a ++ b }
+  }
+
+  def shortenRowsA(part: Seq[Seq[Int]]): Seq[Seq[Int]] = {
+    part.zipWithIndex.map { case (row, i) =>
       val n = part.size
       val (from, to) = shortenA(i, n)
       val filteredCol = row.zipWithIndex
@@ -208,7 +243,10 @@ object Imagecube {
         .map { case (c, _) => c }
       linearCompress(filteredCol, n / 2, colorMix)
     }
-    val newRowsB = part.zipWithIndex.map { case (row, i) =>
+  }
+  
+  def shortenRowsB(part: Seq[Seq[Int]]): Seq[Seq[Int]] = {
+    part.zipWithIndex.map { case (row, i) =>
       val n = part.size
       val (from, to) = shortenB(i, n)
       val filteredCol = row.zipWithIndex
@@ -217,9 +255,8 @@ object Imagecube {
       val m = if (n % 2 == 0) n / 2 else n / 2 + 1
       linearCompress(filteredCol, m, colorMix)
     }
-    newRowsA.zip(newRowsB).map { case (a, b) => a ++ b }
   }
-
+  
   def shortenA(i: Int, n: Int): (Int, Int) = {
     val a = (3.0 * n / 2.0).round.toInt
     val from = i

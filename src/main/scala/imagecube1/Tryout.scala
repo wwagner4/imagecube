@@ -21,33 +21,9 @@ object Tryout extends App {
   // shorten()
   // shorten1()
   // positionParts()
-  // writeImage()
-  parallel()
+  writeImage()
+  // parallel()
 
-  def parallel(): Unit = {
-    val ran = new java.util.Random()
-        
-    def job(id: String, steps: Int): Int = {
-      println(f"JOB_$id STARTED")
-      (1 to steps).foreach { i => 
-        Thread.sleep(5 + ran.nextInt(95))
-        println(f"JOB_$id $i%3d/$steps%3d")
-      }
-      println(f"JOB_$id READY")
-      steps
-    }
-    
-    import scala.concurrent._
-    import ExecutionContext.Implicits.global
-    import scala.concurrent.duration._
-
-    val f1 = Future { job("A", 50)}
-    val f2 = Future { job("B", 10)}
-    val r: Future[(Int, Int)] = for(r1 <- f1; r2 <- f2) yield (r1, r2)
-    val (a, b): (Int, Int) = Await.result(r, Duration(10, SECONDS))
-    println(s"ready $a $b")  
-  }
-  
   def writeImage(): Unit = {
 
     val names = List(
@@ -64,21 +40,20 @@ object Tryout extends App {
     val startTime = System.currentTimeMillis()
     names.par.foreach{ name =>
       val fName = s"$name.jpg"
-      val fOutName = s"${name}_out.png"
-      val f = new File(dir, fName)
-      val img = readImage(f)
-
-      println(s"created img for $fName")
-
-      val shortImg = shortenImg(img)
-
-      val bi = createImage(shortImg, 50)
-
-      val outFile = new File(tmpdir, fOutName)
-      val typ = imageType(outFile)
-      ImageIO.write(bi, typ, outFile)
-
-      println(s"wrote image to $outFile type: $typ")
+      try {
+        val fOutName = s"${name}_out.png"
+        val f = new File(dir, fName)
+        val img = readImage(f)
+        println(s"created img for $fName")
+        val shortImg = shortenImgPar(img)
+        val bi = createImage(shortImg, 50)
+        val outFile = new File(tmpdir, fOutName)
+        val typ = imageType(outFile)
+        ImageIO.write(bi, typ, outFile)
+        println(s"wrote image to $outFile type: $typ")
+      } catch {
+        case e: Exception => println(s"ERROR: Could not convert image $fName because $e")
+      }
     }
     val stopTime = System.currentTimeMillis()
     println(s"time: ${stopTime - startTime}")
@@ -104,7 +79,7 @@ object Tryout extends App {
 
     println(s"created img for $fName")
 
-    val shortImg = shortenImg(img)
+    val shortImg = shortenImgPar(img)
     println(s"shorted image from $fName - partLen: ${shortImg.partLen}")
   }
 
@@ -263,7 +238,31 @@ object Tryout extends App {
     }
   }
 
-  def readFile(): Unit = {
+   def parallel(): Unit = {
+    val ran = new java.util.Random()
+        
+    def job(id: String, steps: Int): Int = {
+      println(f"JOB_$id STARTED")
+      (1 to steps).foreach { i => 
+        Thread.sleep(5 + ran.nextInt(95))
+        println(f"JOB_$id $i%3d/$steps%3d")
+      }
+      println(f"JOB_$id READY")
+      steps
+    }
+    
+    import scala.concurrent._
+    import ExecutionContext.Implicits.global
+    import scala.concurrent.duration._
+
+    val f1 = Future { job("A", 50)}
+    val f2 = Future { job("B", 10)}
+    val r: Future[(Int, Int)] = for(r1 <- f1; r2 <- f2) yield (r1, r2)
+    val (a, b): (Int, Int) = Await.result(r, Duration(10, SECONDS))
+    println(s"ready $a $b")  
+  }
+  
+ def readFile(): Unit = {
     val fName = "tiny1.jpg"
     val f = new File(dir, fName)
     val img = readImage(f).toString.take(100) + " ..."
