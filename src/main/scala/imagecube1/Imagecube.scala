@@ -117,9 +117,9 @@ object Imagecube {
       img.partLen,
       img.center,
       shortenImagePart(img.left),
-      shortenImagePart(img.right),
+      shortenImagePart(img.right.reverse).reverse,
       shortenImagePart(img.top),
-      shortenImagePart(img.bottom)
+      shortenImagePart(img.bottom.reverse).reverse
     )
   }
 

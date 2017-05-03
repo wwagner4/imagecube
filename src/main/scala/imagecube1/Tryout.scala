@@ -57,20 +57,33 @@ object Tryout extends App {
 
     }
 
-    val fName = "cow.jpg"
-    val f = new File(dir, fName)
-    val img = readImage(f)
+    val names = List(
+      "cow",
+      "cow1",
+      "big",
+      "big1"
+    )
 
-    println(s"created img for $fName")
+    val startTime = System.currentTimeMillis()
+    names.foreach{ name =>
+      val fName = s"$name.jpg"
+      val fOutName = s"${name}_out.jpg"
+      val f = new File(dir, fName)
+      val img = readImage(f)
 
-    val shortImg = shortenImg(img)
+      println(s"created img for $fName")
 
-    val bi = writeImage(shortImg, 5)
+      val shortImg = shortenImg(img)
 
-    val outFile = new File(tmpdir, "out.jpg")
-    ImageIO.write(bi, "JPG", outFile)
+      val bi = writeImage(shortImg, 5)
 
-    println(s"wrote image to $outFile")
+      val outFile = new File(tmpdir, fOutName)
+      ImageIO.write(bi, "JPG", outFile)
+
+      println(s"wrote image to $outFile")
+    }
+    val stopTime = System.currentTimeMillis()
+    println(s"time: ${stopTime - startTime}")
   }
 
   def positionParts(): Unit = {
