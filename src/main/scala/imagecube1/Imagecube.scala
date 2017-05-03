@@ -48,6 +48,21 @@ case class Size(
                )
 
 object Imagecube {
+  
+def writeImage(f: File, outDir: File): Unit = {
+  try {
+    val img = readImage(f)
+    val shortImg = shortenImgPar(img)
+    val bi = createImage(shortImg, percent(img.partLen, 50))
+    val fOutName = s"${extractName(f)}_out.png"
+    val outFile = new File(outDir, fOutName)
+    val typ = imageType(outFile)
+    ImageIO.write(bi, typ, outFile)
+    println(s"wrote image to $outFile type: $typ")
+  } catch {
+    case e: Exception => println(s"ERROR: Could not convert image ${f.getName} because $e")
+  }
+}
 
   def imageSize(partLen: Int, border: Int): Size = {
     Size(
@@ -321,9 +336,15 @@ object Imagecube {
     writeImagePartTransp(bi, img.right, pos.right)
     writeImagePart(bi, img.top, pos.top)
     writeImagePart(bi, img.bottom, pos.bottom)
-
     bi
-
   }
+  def percent(value: Int, perc: Int): Int = (value.toDouble * perc / 100.0).round.toInt   
+    
+  def extractName(f: File): String = {
+      val i = f.getName.lastIndexOf('.')
+      if (i < 0) f.getName
+      else f.getName().substring(0, i)
+  }  
+
 
 }

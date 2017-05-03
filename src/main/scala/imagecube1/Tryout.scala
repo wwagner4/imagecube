@@ -21,10 +21,12 @@ object Tryout extends App {
   // shorten()
   // shorten1()
   // positionParts()
-  writeImage()
   // parallel()
-
-  def writeImage(): Unit = {
+  // perc()
+  //runExtractName()
+  runWriteImage()
+  
+  def runWriteImage(): Unit = {
 
     val names = List(
       "cow",
@@ -33,30 +35,34 @@ object Tryout extends App {
       "big1"
     )
 
-    val names1 = List(
-      "cow"
-    )
-
     val startTime = System.currentTimeMillis()
     names.par.foreach{ name =>
       val fName = s"$name.jpg"
-      try {
-        val fOutName = s"${name}_out.png"
-        val f = new File(dir, fName)
-        val img = readImage(f)
-        println(s"created img for $fName")
-        val shortImg = shortenImgPar(img)
-        val bi = createImage(shortImg, 50)
-        val outFile = new File(tmpdir, fOutName)
-        val typ = imageType(outFile)
-        ImageIO.write(bi, typ, outFile)
-        println(s"wrote image to $outFile type: $typ")
-      } catch {
-        case e: Exception => println(s"ERROR: Could not convert image $fName because $e")
-      }
+      val f = new File(dir, fName)
+      writeImage(f, tmpdir)
     }
     val stopTime = System.currentTimeMillis()
     println(s"time: ${stopTime - startTime}")
+  }
+  
+  def runExtractName(): Unit = {
+    Seq(
+      new File("a/b/c.png"),
+      new File("a/b/c"),
+      new File("a/b/cksjdfhskd_kasdjsal.png"),
+      new File("a/b/c.jpg.k"),
+    ).foreach { f => 
+      val name = extractName(f)
+      println(s"$f -> $name")
+    }
+  }
+
+  def perc(): Unit = {
+    val value = 1000
+    (1 to 20).foreach { p =>
+      val value1 = percent(value, p)
+      println(s"$value $p% -> $value1")
+    }
   }
 
   def positionParts(): Unit = {
@@ -198,13 +204,9 @@ object Tryout extends App {
   }
 
   def compress(): Unit = {
-
     def mean(in: Seq[Double]): Double = in.sum / in.size
-
     val in = List(1, 2, 3, 4, 2, 22, 23, 3, 24, 25, 72, 2, 2, 2, 2, 2, 2, 4, 2).map(_.toDouble)
-
     (1 to in.size).foreach(n => println(linearCompress(in, n, mean).mkString(", ")))
-
   }
 
   lazy val fibs: Stream[Int] = 0 #:: 1 #:: fibs.zip(fibs.tail).map { n => n._1 + n._2 }
