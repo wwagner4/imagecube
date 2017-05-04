@@ -66,7 +66,8 @@ object Imagecube {
       ImageIO.write(bi, typ, outFile)
       println(s"wrote image to $outFile type: $typ")
     } catch {
-      case e: Exception => println(s"ERROR: Could not convert image ${f.getName} because $e")
+      case e: Exception =>
+        println(s"ERROR: Could not convert image ${f.getName} because $e")
     }
   }
 
@@ -117,6 +118,7 @@ object Imagecube {
     }
 
     val bi = ImageIO.read(file)
+    if (bi == null) throw new IllegalStateException(s"$file seems not to contain image data")
     val w = bi.getWidth()
     val h = bi.getHeight()
     println(s"readImage $w $h")

@@ -22,8 +22,8 @@ object Tryout extends App {
   // parallel()
   // perc()
   // runExtractName()
-  runTestImages()
-  // runDir()
+  // runTestImages()
+  runDir()
 
   def runDir(): Unit = {
 
@@ -34,11 +34,15 @@ object Tryout extends App {
 
     val files = inDir.listFiles()
 
-
+    val start = System.nanoTime()
     files.foreach{ f =>
-      writeImage(f, outDir)
+      if (f.isFile) {
+        writeImage(f, outDir)
+      }
     }
-    println("FINISHED runDir")
+    val stop = System.nanoTime()
+    val time = (stop - start).toDouble / 1000000000L
+    println(f"FINISHED runDir $time%.2f s")
   }
 
   def runTestImages(): Unit = {
@@ -65,7 +69,7 @@ object Tryout extends App {
       new File("a/b/c.png"),
       new File("a/b/c"),
       new File("a/b/cksjdfhskd_kasdjsal.png"),
-      new File("a/b/c.jpg.k"),
+      new File("a/b/c.jpg.k")
     ).foreach { f => 
       val name = extractName(f)
       println(s"$f -> $name")
