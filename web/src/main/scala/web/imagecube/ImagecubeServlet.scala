@@ -4,7 +4,7 @@ import org.scalatra._
 import servlet.{MultipartConfig, SizeConstraintExceededException, FileUploadSupport}
 import xml.Node
 
-class MyScalatraServlet extends ScalatraServlet with FileUploadSupport with FlashMapSupport {
+class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with FlashMapSupport {
   
   val limit = 20
   
