@@ -416,9 +416,11 @@ object Imagecube {
   }
   
   def writeImage(bi: BufferedImage, mimeType: String): Array[Byte] = {
-    println(s"bi: $bi")
+    import scala.collection.JavaConverters._
+
     val os = new ByteArrayOutputStream()
-    val wrt = ImageIO.getImageWritersByMIMEType(mimeType).next();
+    val writers = ImageIO.getImageWritersByMIMEType(mimeType).asScala.toList
+    val wrt = if (!writers.isEmpty) writers(0) else throw new IllegalStateException(s"Unknown image mime type'$mimeType'") 
     val ios = ImageIO.createImageOutputStream(os);
     wrt.setOutput(ios);
     wrt.write(bi);
@@ -429,11 +431,8 @@ object Imagecube {
   def readImage(in: InputStream, mimeType: String): BufferedImage = {
     import scala.collection.JavaConverters._
     
-    println(s"readStream $in $mimeType")
     val readers = ImageIO.getImageReadersByMIMEType(mimeType).asScala.toList
     val reader = if (!readers.isEmpty) readers(0) else throw new IllegalStateException(s"Unknown image mime type'$mimeType'")   
-    println(s"reader: $reader")
-  
     val iis=ImageIO.createImageInputStream(in);
     reader.setInput(iis);
     reader.read(reader.getMinIndex)
