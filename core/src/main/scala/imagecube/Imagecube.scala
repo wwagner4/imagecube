@@ -2,7 +2,7 @@ package imagecube
 
 import java.awt._
 import java.awt.image.BufferedImage
-import java.io.File
+import java.io._
 import javax.imageio.ImageIO
 
 import scala.concurrent._
@@ -414,6 +414,31 @@ object Imagecube {
 
     bi
   }
+  
+  def writeImage(bi: BufferedImage, mimeType: String): Array[Byte] = {
+    println(s"bi: $bi")
+    val os = new ByteArrayOutputStream()
+    val wrt = ImageIO.getImageWritersByMIMEType(mimeType).next();
+    val ios = ImageIO.createImageOutputStream(os);
+    wrt.setOutput(ios);
+    wrt.write(bi);
+    os.close();
+    os.toByteArray
+  }
+  
+  def readImage(in: InputStream, mimeType: String): BufferedImage = {
+    import scala.collection.JavaConverters._
+    
+    println(s"readStream $in $mimeType")
+    val readers = ImageIO.getImageReadersByMIMEType(mimeType).asScala.toList
+    val reader = if (!readers.isEmpty) readers(0) else throw new IllegalStateException(s"Unknown image mime type'$mimeType'")   
+    println(s"reader: $reader")
+  
+    val iis=ImageIO.createImageInputStream(in);
+    reader.setInput(iis);
+    reader.read(reader.getMinIndex)
+  }
+
 
   def percent(value: Int, perc: Int): Int = (value.toDouble * perc / 100.0).round.toInt
 
