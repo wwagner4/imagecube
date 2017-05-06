@@ -39,9 +39,9 @@ lazy val web = project.in(file("web"))
     libraryDependencies += "org.scalatra" %% "scalatra" % ScalatraVersion,
     libraryDependencies += "org.scalatra" %% "scalatra-scalate" % ScalatraVersion,
     libraryDependencies += "org.scalatra" %% "scalatra-specs2" % ScalatraVersion % "test",
-    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.5" % "runtime",
     libraryDependencies += "org.eclipse.jetty" % "jetty-webapp" % "9.4.5.v20170502",
-    libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided"
+    libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided",
+    libraryDependencies += "org.slf4j" % "slf4j-simple" % "1.7.24"
   )
     
     
