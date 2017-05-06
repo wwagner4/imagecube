@@ -25,7 +25,7 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
     contentType="text/html"
     val content = s"""
       <p>Transform your images to cubes</p>
-      <form action="/upload" method="post" enctype="multipart/form-data">
+      <form action="upload" method="post" enctype="multipart/form-data">
        <p><input type="file" name="file" value = "select file"/></p>
        <p><input type="submit" value="transform" /></p>
       </form>
