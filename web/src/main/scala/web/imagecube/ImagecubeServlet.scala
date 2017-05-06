@@ -52,12 +52,23 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
           """
           templ(content, BGCOL_alarm)
         } else {
-          val mime = file.contentType.getOrElse("application/octet-stream")
-          val transformed = Imagecube.transformImage(file.getInputStream, mime, mime)
-          Ok(transformed, Map(
-            "Content-Type"        -> (mime),
-            "Content-Disposition" -> ("attachment; filename=\"" + file.name + "\"")
-          ))
+          try {
+            val mime = file.contentType.getOrElse("application/octet-stream")
+            val transformed = Imagecube.transformImage(file.getInputStream, mime, mime)
+            Ok(transformed, Map(
+              "Content-Type"        -> (mime),
+              "Content-Disposition" -> ("attachment; filename=\"" + file.name + "\"")
+            ))
+          } catch {
+            case e: Exception => 
+              e.printStackTrace
+              contentType="text/html"
+              val content = s"""
+              <p  class="b">Error transforming file: ${e.getMessage}</p>
+              $home
+              """
+              templ(content, BGCOL_alarm)
+          }
         }
       case None =>
         contentType="text/html"
