@@ -1,7 +1,7 @@
 package imagecube
 
 import java.awt.Color
-import java.io.File
+import java.io._
 
 import Imagecube._
 
@@ -23,8 +23,26 @@ object Tryout extends App {
   // perc()
   // runExtractName()
   // runTestImages()
-  runDir()
+  // runDir()
+  readWriteStream()
 
+  def readWriteStream(): Unit = {
+    val fNam = "core/src/test/resources/cow.jpg"
+    val f = new File(fNam)
+    val in = new FileInputStream(f)
+    
+    val bi = readImage(in, "image/jpeg")
+    in.close
+    
+    
+    val bytes = writeImage(bi, "image/png")
+    
+    println(bytes.take(100).mkString(","))
+    
+    println("F I N I S H E D")
+  }
+
+  
   def runDir(): Unit = {
 
 
