@@ -21,14 +21,29 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
     )
   }
 
-
   get("/") {
-    <html>
-      <body>
-        <h1>imagecube</h1>
-        <a href="ul">go to upload</a>.
-      </body>
-    </html>
+    contentType="text/html"
+    """
+<html>
+<head>
+<title>imagecube</title>
+<style>
+body {
+    background-color: #ffc299;
+    //background-color: #ff8533;
+    font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, AppleGothic, sans-serif;
+    font-size: 200%;
+    padding: 20px;
+}
+</style>
+</head>
+<body>
+<h1>imagecube</h1>
+<p>select an image in order to create your own imagecube</p>
+<p><a href="http://entelijan.net">entelijan.net</a>
+</body>
+</html>  
+   """
   }
   get("/ul") {
     <html>
