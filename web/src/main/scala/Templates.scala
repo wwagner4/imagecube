@@ -11,10 +11,11 @@ object Templates {
 <html>
 <head>
 <title>imagecube</title>
+<link href="https://fonts.googleapis.com/css?family=Russo+One" rel="stylesheet">
 <style>
 body {
     background-color: ${bg.txt};
-    font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, AppleGothic, sans-serif;
+    font-family: 'Russo One', sans-serif;
     font-size: 200%;
     padding: 20px;
 }
@@ -25,7 +26,20 @@ body {
     font-size: 50%;
     text-align: right;
     padding-top: 20px;
-}	
+}
+.button {
+    background-color: #ffd1b3;
+    border: none;
+    color: black;
+    padding: 25px 40px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 12px;
+}
 </style>
 </head>
 <body>
