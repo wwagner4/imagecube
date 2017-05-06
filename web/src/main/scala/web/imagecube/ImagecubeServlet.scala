@@ -22,14 +22,10 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
   }
 
   get("/") {
-    redirect(url("/start"))
-  }
-  
-  get("/start") {
     contentType="text/html"
     val content = s"""
       <p>Transform your images to cubes</p>
-      <form action="upload" method="post" enctype="multipart/form-data">
+      <form action="/upload" method="post" enctype="multipart/form-data">
        <p><input type="file" name="file" value = "select file"/></p>
        <p><input type="submit" value="transform" /></p>
       </form>
@@ -77,6 +73,7 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
         }
       case None =>
         contentType="text/html"
+        val homeUrl = url("/")
         val content = s"""
         <p  class="b">Hey! You forgot to select a file.</p>
         $home

@@ -38,8 +38,8 @@ $content
  }
   
 def home: String = {
-  """
-        <p><a href="start">back to start ...</a></p>
+  s"""
+        <p><a href="/">back to start ...</a></p>
   """
 }
   
