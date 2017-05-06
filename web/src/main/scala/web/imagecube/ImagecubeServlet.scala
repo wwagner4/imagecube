@@ -22,6 +22,10 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
   }
 
   get("/") {
+    redirect(url("/start"))
+  }
+  
+  get("/start") {
     contentType="text/html"
     val content = s"""
       <p>Transform your images to cubes</p>
