@@ -24,20 +24,25 @@ object Tryout extends App {
   // runExtractName()
   // runTestImages()
   // runDir()
-  // readWriteStream()
+  // readWriteStream() 
   readWriteStream1()
 
   def readWriteStream1(): Unit = {
+    
+    def transformImage(in: InputStream, inMime: String, outMime: String): Array[Byte] = {
+      val bi = readImage(in, inMime)
+      in.close
+      val img = readImage(bi)  
+      val shortImg = shortenImgPar(img)
+      val biOut = createImage(shortImg, percent(img.partLen, 20))
+      writeImage(biOut, outMime)
+    }
+    
     val fNam = "cow.jpg"
     val f = new File(dir, fNam)
     val in = new FileInputStream(f)
-    
-    val bi = readImage(in, "image/jpeg")
-    in.close
-    val img = readImage(bi)  
-    val shortImg = shortenImgPar(img)
-    val biOut = createImage(shortImg, percent(img.partLen, 20))
-    val bytes = writeImage(biOut, "image/png")
+
+    val bytes = transformImage(in, "image/jpeg", "image/png")
 
     val out = new File(tmpdir, "so_cow.png") 
     val target = new BufferedOutputStream( new FileOutputStream(out) );

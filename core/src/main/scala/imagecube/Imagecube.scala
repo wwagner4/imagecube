@@ -54,6 +54,15 @@ case class Size(
                )
 
 object Imagecube {
+  
+  def transformImage(in: InputStream, inMime: String, outMime: String): Array[Byte] = {
+    val bi = readImage(in, inMime)
+    in.close
+    val img = readImage(bi)  
+    val shortImg = shortenImgPar(img)
+    val biOut = createImage(shortImg, percent(img.partLen, 20))
+    writeImage(biOut, outMime)
+  }
 
   def writeImage(f: File, outDir: File): Unit = {
     try {
