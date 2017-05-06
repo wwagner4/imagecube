@@ -7,7 +7,7 @@ import Templates._
 
 class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with FlashMapSupport {
   
-  val limit = 10
+  val limit = 3
   
   configureMultipartHandling(MultipartConfig(maxFileSize = Some(limit *1024*1024)))
   

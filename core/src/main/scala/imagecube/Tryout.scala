@@ -23,9 +23,9 @@ object Tryout extends App {
   // perc()
   // runExtractName()
   // runTestImages()
-  // runDir()
+  runDir()
   // readWriteStream() 
-  readWriteStream1()
+  // readWriteStream1()
 
   def readWriteStream1(): Unit = {
     
