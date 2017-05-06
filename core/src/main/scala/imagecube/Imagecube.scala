@@ -171,7 +171,7 @@ object Imagecube {
     }
     val r = for (rLeft <- fLeft; rRight <- fRight; rTop <- fTop; rBottom <- fBottom)
       yield (rLeft, rRight, rTop, rBottom)
-    val (left, right, top, bottom) = Await.result(r, Duration(20, SECONDS))
+    val (left, right, top, bottom) = Await.result(r, Duration(30, SECONDS))
     Img(
       img.partLen, img.center, left, right, top, bottom
     )
@@ -267,7 +267,7 @@ object Imagecube {
       shortenRowsB(part)
     }
     val r = for (rRowsA <- fRowsA; rRowsB <- fRowsB) yield (rRowsA, rRowsB)
-    val (newRowsA, newRowsB) = Await.result(r, Duration(10, SECONDS))
+    val (newRowsA, newRowsB) = Await.result(r, Duration(30, SECONDS))
     newRowsA.zip(newRowsB).map { case (a, b) => a ++ b }
   }
 
