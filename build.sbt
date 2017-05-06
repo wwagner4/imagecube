@@ -8,8 +8,7 @@ lazy val commonSettings = Seq(
     organization := "net.entelijan",
     version := "1.0",
     scalaVersion := "2.12.2",
-    libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test",
-    libraryDependencies += "org.slf4j" % "slf4j-simple" % "1.7.24"
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test"
 )
 
 lazy val root = project.in(file("."))
@@ -35,12 +34,13 @@ lazy val web = project.in(file("web"))
     scalateSettings,
     containerPort in Jetty := 8090,
     resolvers += Classpaths.typesafeReleases,
-    libraryDependencies += "org.slf4j" % "slf4j-simple" % "1.7.24",
+    assemblyJarName in assembly := "imagecube-web.jar",
+    mainClass in assembly := Some("web.imagecube.JettyLauncher"),
     libraryDependencies += "org.scalatra" %% "scalatra" % ScalatraVersion,
     libraryDependencies += "org.scalatra" %% "scalatra-scalate" % ScalatraVersion,
     libraryDependencies += "org.scalatra" %% "scalatra-specs2" % ScalatraVersion % "test",
     libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.5" % "runtime",
-    libraryDependencies += "org.eclipse.jetty" % "jetty-webapp" % "9.2.15.v20160210" % "container",
+    libraryDependencies += "org.eclipse.jetty" % "jetty-webapp" % "9.4.5.v20170502",
     libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided"
   )
     
