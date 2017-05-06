@@ -38,6 +38,9 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
     templ(content, BGCOL_normal)
   }
   post("/upload") {
+    
+    import imagecube._
+    
     fileParams.get("file") match {
       case Some(file) =>
         println(s"found a file - $file - size:${file.getSize} - type:${file.contentType.getOrElse("???")}")
@@ -49,8 +52,10 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
           """
           templ(content, BGCOL_alarm)
         } else {
-          Ok(file.get(), Map(
-            "Content-Type"        -> (file.contentType.getOrElse("application/octet-stream")),
+          val mime = file.contentType.getOrElse("application/octet-stream")
+          val transformed = Imagecube.transformImage(file.getInputStream, mime, mime)
+          Ok(transformed, Map(
+            "Content-Type"        -> (mime),
             "Content-Disposition" -> ("attachment; filename=\"" + file.name + "\"")
           ))
         }

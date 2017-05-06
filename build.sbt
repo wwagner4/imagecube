@@ -25,7 +25,8 @@ lazy val core = project.in(file("core"))
     name := "imagecube-core"
   )
 
-lazy val web = project.in(file("web"))  
+lazy val web = project.in(file("web"))
+  .dependsOn(core)
   .enablePlugins(JettyPlugin)
   .settings(
     commonSettings,
