@@ -59,7 +59,7 @@ object Imagecube {
     val bi = readImage(in, inMime)
     in.close
     val img = readImage(bi)  
-    val shortImg = shortenImgSeq(img)
+    val shortImg = shortenImgPar(img)
     val biOut = createImage(shortImg, percent(img.partLen, 20))
     writeImage(biOut, outMime)
   }
@@ -69,7 +69,7 @@ object Imagecube {
       val biIn = ImageIO.read(f)
       if (biIn == null) throw new IllegalStateException(s"$f seems not to contain image data")
       val img = readImage(biIn)  
-      val shortImg = shortenImgSeq(img)
+      val shortImg = shortenImgPar(img)
       val biOut = createImage(shortImg, percent(img.partLen, 20))
       val fOutName = s"${extractName(f)}_out.png"
       val outFile = new File(outDir, fOutName)
