@@ -57,13 +57,15 @@ object Imagecube {
 
   def writeImage(f: File, outDir: File): Unit = {
     try {
-      val img = readImage(f)
+      val biIn = ImageIO.read(f)
+      if (biIn == null) throw new IllegalStateException(s"$f seems not to contain image data")
+      val img = readImage(biIn)  
       val shortImg = shortenImgPar(img)
-      val bi = createImage(shortImg, percent(img.partLen, 20))
+      val biOut = createImage(shortImg, percent(img.partLen, 20))
       val fOutName = s"${extractName(f)}_out.png"
       val outFile = new File(outDir, fOutName)
       val typ = imageType(outFile)
-      ImageIO.write(bi, typ, outFile)
+      ImageIO.write(biOut, typ, outFile)
       println(s"wrote image to $outFile type: $typ")
     } catch {
       case e: Exception =>
@@ -87,7 +89,7 @@ object Imagecube {
     PartsPositions(center, left, right, top, bottom)
   }
 
-  def readImage(file: File): Img = {
+  def readImage(bi: BufferedImage): Img = {
 
     def readImage(bi: BufferedImage, x: Range, y: Range): Seq[Seq[Int]] = {
       println(s"readImage $x $y")
@@ -117,8 +119,6 @@ object Imagecube {
       }
     }
 
-    val bi = ImageIO.read(file)
-    if (bi == null) throw new IllegalStateException(s"$file seems not to contain image data")
     val w = bi.getWidth()
     val h = bi.getHeight()
     println(s"readImage $w $h")

@@ -24,7 +24,26 @@ object Tryout extends App {
   // runExtractName()
   // runTestImages()
   // runDir()
-  readWriteStream()
+  // readWriteStream()
+  readWriteStream1()
+
+  def readWriteStream1(): Unit = {
+    val fNam = "cow.jpg"
+    val f = new File(dir, fNam)
+    val in = new FileInputStream(f)
+    
+    val bi = readImage(in, "image/jpeg")
+    in.close
+    val img = readImage(bi)  
+    val shortImg = shortenImgPar(img)
+    val biOut = createImage(shortImg, percent(img.partLen, 20))
+    val bytes = writeImage(biOut, "image/png")
+
+    val out = new File(tmpdir, "so_cow.png") 
+    val target = new BufferedOutputStream( new FileOutputStream(out) );
+    try bytes.foreach( target.write(_) ) finally target.close;    
+    println(s"wrote to $out")
+  }
 
   def readWriteStream(): Unit = {
     val fNam = "core/src/test/resources/cow.jpg"
@@ -112,18 +131,6 @@ object Tryout extends App {
 
     println(s)
     println(pp)
-  }
-
-  def shorten1(): Unit = {
-
-    val fName = "cow.jpg"
-    val f = new File(dir, fName)
-    val img = readImage(f)
-
-    println(s"created img for $fName")
-
-    val shortImg = shortenImgPar(img)
-    println(s"shorted image from $fName - partLen: ${shortImg.partLen}")
   }
 
   def shorten(): Unit = {
@@ -301,19 +308,10 @@ object Tryout extends App {
     println(s"ready $a $b")  
   }
   
- def readFile(): Unit = {
-    val fName = "tiny1.jpg"
-    val f = new File(dir, fName)
-    val img = readImage(f).toString.take(100) + " ..."
-    println(s"created img for $fName")
-    println(s"img: $img")
-  }
-
-
-  def dir: File = new File("src/test/resources")
+  def dir: File = new File("core/src/test/resources")
 
   def tmpdir: File = {
-    val re = new File("target/tmp")
+    val re = new File("core/target/tmp")
     if (!re.exists()) re.mkdirs()
     re
   }
