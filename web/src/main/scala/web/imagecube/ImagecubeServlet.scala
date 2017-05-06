@@ -24,8 +24,9 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
   get("/") {
     contentType="text/html"
     val content = s"""
+      <p>Transform your images to cubes</p>
       <form action="/upload" method="post" enctype="multipart/form-data">
-       <p>File to be transformed <input type="file" name="file" value = "select file"/></p>
+       <p><input type="file" name="file" value = "select file"/></p>
        <p><input type="submit" value="transform" /></p>
       </form>
       <p>
@@ -43,7 +44,7 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
     
     fileParams.get("file") match {
       case Some(file) =>
-        println(s"found a file - $file - size:${file.getSize} - type:${file.contentType.getOrElse("???")}")
+        println(s"found a file - $file - size:${file.getSize} - type:${file.contentType.getOrElse("?")}")
         if (file.getSize == 0) {
           contentType="text/html"
           val content = s"""

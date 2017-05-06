@@ -33,6 +33,7 @@ lazy val web = project.in(file("web"))
     name := "imagecube-web",
     ScalatraPlugin.scalatraSettings,
     scalateSettings,
+    containerPort in Jetty := 8090,
     resolvers += Classpaths.typesafeReleases,
     libraryDependencies += "org.slf4j" % "slf4j-simple" % "1.7.24",
     libraryDependencies += "org.scalatra" %% "scalatra" % ScalatraVersion,

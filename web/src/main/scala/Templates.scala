@@ -1,7 +1,7 @@
 package web.imagecube
 
 sealed trait BGCOL { def txt: String }
-case object BGCOL_normal extends BGCOL {def txt = "#ffc299"}
+case object BGCOL_normal extends BGCOL {def txt = "#ff9933"}
 case object BGCOL_alarm extends BGCOL {def txt = "#ff8533"}
 
 object Templates {
@@ -22,14 +22,16 @@ body {
     font-weight: bold;		
 }	
 .s {
-    font-size: 50%;		
+    font-size: 50%;
+    text-align: right;
+    padding-top: 20px;
 }	
 </style>
 </head>
 <body>
 <h1>imagecube</h1>
 $content
-<p class="s"><a href="http://entelijan.net">entelijan.net ... </a>
+<p class="s" ><a href="http://entelijan.net">entelijan.net ... </a>
 </body>
 </html>  
    """
