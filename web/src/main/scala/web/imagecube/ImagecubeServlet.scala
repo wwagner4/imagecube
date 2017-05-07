@@ -40,8 +40,9 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
         Select a file. After you hit "transform"
         an imagecube will be created and downloaded to your computer
       </p>
+      <p>The maximum file size accepted is ${limit} MB</p>
+      <p>See some cubes at the <a target="_blank" href="http://imgur.com/a/iTPwP">cube gallery (imgur) ... </a></p>
 
-      <p> The maximum file size accepted is ${limit} MB</p>
     """
     templ(content, BGCOL_normal)
   }
