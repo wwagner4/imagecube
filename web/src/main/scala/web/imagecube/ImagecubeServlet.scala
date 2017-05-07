@@ -13,7 +13,7 @@ import scala.concurrent.duration.Duration._
 
 class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with FlashMapSupport {
   
-  val limit = 3
+  val limit = 1
   val runmode = RUNMODE_Parallel(Duration(30, SECONDS))
   
   configureMultipartHandling(MultipartConfig(maxFileSize = Some(limit *1024*1024)))
