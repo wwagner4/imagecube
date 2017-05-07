@@ -52,34 +52,23 @@ case class Size(
                  w: Int,
                  h: Int
                )
+               
+sealed trait RUNMODE
+case object RUNMODE_Seq extends RUNMODE
+case class RUNMODE_Parallel(timeout: Duration) extends RUNMODE
 
 object Imagecube {
   
-  def transformImage(in: InputStream, inMime: String, outMime: String): Array[Byte] = {
+  def transformImage(in: InputStream, inMime: String, outMime: String, runMode: RUNMODE): Array[Byte] = {
     val bi = readImage(in, inMime)
     in.close
     val img = readImage(bi)  
-    val shortImg = shortenImgPar(img)
+    val shortImg = runMode match {
+      case RUNMODE_Seq => shortenImgSeq(img)
+      case RUNMODE_Parallel(timeout) => shortenImgPar(img, timeout)
+    }
     val biOut = createImage(shortImg, percent(img.partLen, 20))
     writeImage(biOut, outMime)
-  }
-
-  def writeImage(f: File, outDir: File): Unit = {
-    try {
-      val biIn = ImageIO.read(f)
-      if (biIn == null) throw new IllegalStateException(s"$f seems not to contain image data")
-      val img = readImage(biIn)  
-      val shortImg = shortenImgPar(img)
-      val biOut = createImage(shortImg, percent(img.partLen, 20))
-      val fOutName = s"${extractName(f)}_out.png"
-      val outFile = new File(outDir, fOutName)
-      val typ = imageType(outFile)
-      ImageIO.write(biOut, typ, outFile)
-      println(s"wrote image to $outFile type: $typ")
-    } catch {
-      case e: Exception =>
-        println(s"ERROR: Could not convert image ${f.getName} because $e")
-    }
   }
 
   def imageSize(partLen: Int, border: Int): Size = {
@@ -156,22 +145,22 @@ object Imagecube {
     )
   }
 
-  def shortenImgPar(img: Img): Img = {
+  def shortenImgPar(img: Img, timeout: Duration): Img = {
     val fLeft = Future {
-      shortenImagePartPar(img.left)
+      shortenImagePartPar(img.left, timeout)
     }
     val fRight = Future {
-      shortenImagePartPar(img.right.reverse).reverse
+      shortenImagePartPar(img.right.reverse, timeout).reverse
     }
     val fTop = Future {
-      shortenImagePartPar(img.top)
+      shortenImagePartPar(img.top, timeout)
     }
     val fBottom = Future {
-      shortenImagePartPar(img.bottom.reverse).reverse
+      shortenImagePartPar(img.bottom.reverse, timeout).reverse
     }
     val r = for (rLeft <- fLeft; rRight <- fRight; rTop <- fTop; rBottom <- fBottom)
       yield (rLeft, rRight, rTop, rBottom)
-    val (left, right, top, bottom) = Await.result(r, Duration(30, SECONDS))
+    val (left, right, top, bottom) = Await.result(r, timeout)
     Img(
       img.partLen, img.center, left, right, top, bottom
     )
@@ -258,7 +247,7 @@ object Imagecube {
     newRowsA.zip(newRowsB).map { case (a, b) => a ++ b }
   }
 
-  def shortenImagePartPar(part: Seq[Seq[Int]]): Seq[Seq[Int]] = {
+  def shortenImagePartPar(part: Seq[Seq[Int]], timeout: Duration): Seq[Seq[Int]] = {
 
     val fRowsA = Future {
       shortenRowsA(part)
@@ -267,7 +256,7 @@ object Imagecube {
       shortenRowsB(part)
     }
     val r = for (rRowsA <- fRowsA; rRowsB <- fRowsB) yield (rRowsA, rRowsB)
-    val (newRowsA, newRowsB) = Await.result(r, Duration(30, SECONDS))
+    val (newRowsA, newRowsB) = Await.result(r, timeout)
     newRowsA.zip(newRowsB).map { case (a, b) => a ++ b }
   }
 

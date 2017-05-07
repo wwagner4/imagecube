@@ -2,6 +2,10 @@ package imagecube
 
 import java.awt.Color
 import java.io._
+import scala.concurrent.duration._
+import scala.concurrent.duration.Duration._
+
+import javax.imageio._
 
 import Imagecube._
 
@@ -23,87 +27,75 @@ object Tryout extends App {
   // perc()
   // runExtractName()
   // runTestImages()
+  // readWriteStream()
   runDir()
-  // readWriteStream() 
-  // readWriteStream1()
 
-  def readWriteStream1(): Unit = {
-    
-    def transformImage(in: InputStream, inMime: String, outMime: String): Array[Byte] = {
-      val bi = readImage(in, inMime)
-      in.close
-      val img = readImage(bi)  
-      val shortImg = shortenImgPar(img)
-      val biOut = createImage(shortImg, percent(img.partLen, 20))
-      writeImage(biOut, outMime)
-    }
-    
-    val fNam = "cow.jpg"
-    val f = new File(dir, fNam)
-    val in = new FileInputStream(f)
-
-    val bytes = transformImage(in, "image/jpeg", "image/png")
-
-    val out = new File(tmpdir, "so_cow.png") 
-    val target = new BufferedOutputStream( new FileOutputStream(out) );
-    try bytes.foreach( target.write(_) ) finally target.close;    
-    println(s"wrote to $out")
-  }
-
-  def readWriteStream(): Unit = {
-    val fNam = "core/src/test/resources/cow.jpg"
-    val f = new File(fNam)
-    val in = new FileInputStream(f)
-    
-    val bi = readImage(in, "image/jpeg")
-    in.close
-    
-    
-    val bytes = writeImage(bi, "image/png")
-    
-    println(bytes.take(100).mkString(","))
-    
-    println("F I N I S H E D")
-  }
-
-  
   def runDir(): Unit = {
-
-
+    
+    def writeImage(f: File, outDir: File, runMode: RUNMODE): Unit = {
+      try {
+        val biIn = ImageIO.read(f)
+        if (biIn == null) throw new IllegalStateException(s"$f seems not to contain image data")
+        val img = readImage(biIn)  
+        val shortImg = runMode match {
+          case RUNMODE_Seq => shortenImgSeq(img)
+          case RUNMODE_Parallel(timeout) => shortenImgPar(img, timeout)
+        }
+        val biOut = createImage(shortImg, percent(img.partLen, 20))
+        val fOutName = s"${extractName(f)}_out.png"
+        val outFile = new File(outDir, fOutName)
+        val typ = imageType(outFile)
+        ImageIO.write(biOut, typ, outFile)
+        println(s"wrote image to $outFile type: $typ")
+      } catch {
+        case e: Exception =>
+          println(s"ERROR: Could not convert image ${f.getName} because $e")
+      }
+    }
+  
     val inDir = new File("/Users/wwagner4/tmp/cubes/in")
     val outDir = new File("/Users/wwagner4/tmp/cubes/out")
+    val runMode = RUNMODE_Seq
+  
     outDir.mkdirs()
-
     val files = inDir.listFiles()
-
     val start = System.nanoTime()
     files.foreach{ f =>
       if (f.isFile) {
-        writeImage(f, outDir)
+        writeImage(f, outDir, runMode)
       }
     }
     val stop = System.nanoTime()
     val time = (stop - start).toDouble / 1000000000L
     println(f"FINISHED runDir $time%.2f s")
-  }
 
-  def runTestImages(): Unit = {
+}
 
-    val namesAll = List(
-      "cow",
-      "cow1",
-      "small",
-      "small1"
-    )
-
-    val startTime = System.currentTimeMillis()
-    namesAll.foreach{ name =>
-      val fName = s"$name.jpg"
-      val f = new File(dir, fName)
-      writeImage(f, tmpdir)
+  def readWriteStream(): Unit = {
+    
+    def transformImage(in: InputStream, inMime: String, outMime: String, runMode: RUNMODE): Array[Byte] = {
+      val bi = readImage(in, inMime)
+      in.close
+      val img = readImage(bi)  
+      val shortImg = runMode match {
+            case RUNMODE_Seq => shortenImgSeq(img)
+            case RUNMODE_Parallel(timeout) => shortenImgPar(img, timeout)
+      }
+      val biOut = createImage(shortImg, percent(img.partLen, 20))
+      writeImage(biOut, outMime)
     }
-    val stopTime = System.currentTimeMillis()
-    println(s"time: ${stopTime - startTime}")
+        
+    val runMode = RUNMODE_Seq
+    val fNam = "cow.jpg"
+    val f = new File(dir, fNam)
+    val in = new FileInputStream(f)
+
+    val bytes = transformImage(in, "image/jpeg", "image/png", runMode)
+
+    val out = new File(tmpdir, "so_cow.png") 
+    val target = new BufferedOutputStream( new FileOutputStream(out) );
+    try bytes.foreach( target.write(_) ) finally target.close;    
+    println(s"wrote to $out")
   }
 
   def runExtractName(): Unit = {
