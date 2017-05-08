@@ -44,22 +44,15 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
       <p>See some cubes at the <a target="_blank" href="http://imgur.com/a/iTPwP">cube gallery (imgur) ... </a></p>
 
     """
-    templ(content, BGCOL_normal)
+    templ(content, BGCOL_normal, "### ADDITIONAL ###")
   }
   post("/upload") {
-    
     import imagecube._
-    
+    contentType="text/html"
     fileParams.get("file") match {
       case Some(file) =>
-        println(s"found a file - $file - size:${file.getSize} - type:${file.contentType.getOrElse("?")}")
         if (file.getSize == 0) {
-          contentType="text/html"
-          val content = s"""
-          <p  class="b">Hey! You forgot to select a file.</p>
-          $home
-          """
-          templ(content, BGCOL_alarm)
+          templ(contentError("Hey! You forgot to select a file"), BGCOL_alarm)
         } else {
           try {
             val mime = file.contentType.getOrElse("application/octet-stream")
@@ -71,22 +64,11 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
           } catch {
             case e: Exception => 
               e.printStackTrace
-              contentType="text/html"
-              val content = s"""
-              <p  class="b">Error transforming file: ${e.getMessage}</p>
-              $home
-              """
-              templ(content, BGCOL_alarm)
+              templ(contentError(s"Error transforming file: ${e.getMessage}"), BGCOL_alarm)
           }
         }
       case None =>
-        contentType="text/html"
-        val homeUrl = url("/")
-        val content = s"""
-        <p  class="b">Hey! You forgot to select a file.</p>
-        $home
-        """
-        templ(content, BGCOL_alarm)
+        templ(contentError("Hey! You forgot to select a file"), BGCOL_alarm)
     }
   }
   

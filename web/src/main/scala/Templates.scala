@@ -6,7 +6,7 @@ case object BGCOL_alarm extends BGCOL {def txt = "#ff8533"}
 
 object Templates {
   
- def templ(content: String, bg: BGCOL): String = {
+ def templ(content: String, bg: BGCOL, additionalHeaderContent: String = ""): String = {
        s"""
 <html>
 <head>
@@ -41,6 +41,7 @@ body {
     border-radius: 12px;
 }
 </style>
+$additionalHeaderContent
 </head>
 <body>
 <h1>imagecube</h1>
@@ -54,6 +55,13 @@ $content
 def home: String = {
   s"""
         <p><a href="/">back to start ...</a></p>
+  """
+}
+
+def contentError(text: String): String = {
+  s"""
+          <p  class="b">$text</p>
+        $home
   """
 }
   
