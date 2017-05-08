@@ -17,7 +17,7 @@ body {
     background-color: ${bg.txt};
     font-family: 'Russo One', sans-serif;
     font-size: 200%;
-    padding: 20px;
+    padding: 10px;
 }
 .b {
     font-weight: bold;		
@@ -30,7 +30,7 @@ body {
 .button {
     background-color: #ffd1b3;
     border: none;
-    padding: 5px 70px;
+    padding: 20px 70px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
