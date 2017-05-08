@@ -33,18 +33,17 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
     
     val content = s"""
       <p>Transform your images to cubes</p>
-      <form action="/upload" method="post" enctype="multipart/form-data">
+      <form id="myForm" action="/upload" method="post" enctype="multipart/form-data">
        <p>
        
        <label for="file-upload" class="button">Select a file</label>
-       <input id="file-upload"  class="button" type="file" name="file" value = "select file"/>
+       <input id="file-upload"  class="button" type="file" name="file" value = "select file" onchange="document.getElementById('myForm').submit();"/>
         </p>
         
-       <p><input class="button" type="submit" value="transform" /></p>
       </form>
       <p>
-        Select a file. After you hit "transform"
-        an imagecube will be created and downloaded to your computer
+        After you select an image file 
+        an imagecube will be created and immediately downloaded to your browser
       </p>
       <p>The maximum file size accepted is ${limit} MB</p>
       <p>See some cubes at the <a target="_blank" href="http://imgur.com/a/iTPwP">cube gallery (imgur) ... </a></p>
