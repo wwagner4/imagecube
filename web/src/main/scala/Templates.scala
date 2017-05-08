@@ -6,7 +6,7 @@ case object BGCOL_alarm extends BGCOL {def txt = "#ff8533"}
 
 object Templates {
   
- def templ(content: String, bg: BGCOL): String = {
+ def templ(content: String, bg: BGCOL, additionalHeaderContent: String = ""): String = {
        s"""
 <html>
 <head>
@@ -17,7 +17,7 @@ body {
     background-color: ${bg.txt};
     font-family: 'Russo One', sans-serif;
     font-size: 200%;
-    padding: 20px;
+    padding: 10px;
 }
 .b {
     font-weight: bold;		
@@ -30,17 +30,32 @@ body {
 .button {
     background-color: #ffd1b3;
     border: none;
-    color: black;
-    padding: 25px 40px;
+    padding: 20px 70px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    font-size: 16px;
     margin: 4px 2px;
     cursor: pointer;
     border-radius: 12px;
 }
+input[type="file"] {
+    display: none;
+}
+
+a:link {
+    color: #4d1f00;
+}
+a:visited {
+    color: #4d1f00;
+}
+a:hover {
+    color: #993d00;
+}
+a:active {
+    color: #993d00;
+}
 </style>
+$additionalHeaderContent
 </head>
 <body>
 <h1>imagecube</h1>
@@ -54,6 +69,13 @@ $content
 def home: String = {
   s"""
         <p><a href="/">back to start ...</a></p>
+  """
+}
+
+def contentError(text: String): String = {
+  s"""
+          <p  class="b">$text</p>
+        $home
   """
 }
   
