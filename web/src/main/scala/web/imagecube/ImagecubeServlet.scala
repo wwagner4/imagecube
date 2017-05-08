@@ -30,12 +30,40 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
 
   get("/") {
     contentType="text/html"
+    val header = s"""
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="js/simpleUpload.min.js"></script>
+<script type="text/javascript">
+$$(document).ready(function(){
+	$$('input[type=file]').change(function(){
+		$$(this).simpleUpload("/upload", {
+			start: function(file){
+				//upload started
+				console.log("upload started");
+			},
+			progress: function(progress){
+				//received progress
+				console.log("upload progress: " + Math.round(progress) + "%");
+			},
+			success: function(data){
+				//upload successful
+				console.log("upload successful!");
+				//console.log(data);
+				$$('.div_imagetranscrits').html('<img src="data:image/jpeg;base64,' + data + '" width=400/>');
+			},
+			error: function(error){
+				//upload failed
+				console.log("upload error: " + error.name + ": " + error.message);
+			}
+		});
+	});
+});
+</script>
+    """
     val content = s"""
       <p>Transform your images to cubes</p>
-      <form action="/upload" method="post" enctype="multipart/form-data">
-       <p><input class="button" type="file" name="file" value = "select file"/></p>
-       <p><input class="button" type="submit" value="transform" /></p>
-      </form>
+      <input type="file" name="file">
+      <p><div class="div_imagetranscrits"></div></p>
       <p>
         Select a file. After you hit "transform"
         an imagecube will be created and downloaded to your computer
@@ -44,10 +72,11 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
       <p>See some cubes at the <a target="_blank" href="http://imgur.com/a/iTPwP">cube gallery (imgur) ... </a></p>
 
     """
-    templ(content, BGCOL_normal, "### ADDITIONAL ###")
+    templ(content, BGCOL_normal, header)
   }
   post("/upload") {
     import imagecube._
+    import java.util.Base64
     contentType="text/html"
     fileParams.get("file") match {
       case Some(file) =>
@@ -56,7 +85,7 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
         } else {
           try {
             val mime = file.contentType.getOrElse("application/octet-stream")
-            val transformed = transformImage(file.getInputStream, mime, mime, runmode)
+            val transformed = Base64.getEncoder.encodeToString(transformImage(file.getInputStream, mime, mime, runmode))
             Ok(transformed, Map(
               "Content-Type"        -> (mime),
               "Content-Disposition" -> ("attachment; filename=\"" + file.name + "\"")
