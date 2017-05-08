@@ -41,6 +41,19 @@ body {
 input[type="file"] {
     display: none;
 }
+
+a:link {
+    color: #4d1f00;
+}
+a:visited {
+    color: #4d1f00;
+}
+a:hover {
+    color: #993d00;
+}
+a:active {
+    color: #993d00;
+}
 </style>
 $additionalHeaderContent
 </head>

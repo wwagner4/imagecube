@@ -20,12 +20,8 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
   
     error {
     case e: SizeConstraintExceededException =>
-          contentType="text/html"
-        val content = s"""
-        <p class="b">The file you uploaded exceeded the ${limit} MB limit.</p>
-        $home
-        """
-        templ(content, BGCOL_alarm)
+        contentType="text/html"
+        templ(contentError(s"The image you uploaded exceeded the ${limit} MB limit."), BGCOL_alarm)
   }
 
   get("/") {
@@ -36,16 +32,16 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
       <form id="myForm" action="/upload" method="post" enctype="multipart/form-data">
        <p>
        
-       <label for="file-upload" class="button">Select a file</label>
+       <label for="file-upload" class="button">Select an image</label>
        <input id="file-upload"  class="button" type="file" name="file" value = "select file" onchange="document.getElementById('myForm').submit();"/>
         </p>
         
       </form>
       <p>
-        After you select an image file 
-        an imagecube will be created and immediately downloaded to your browser
+        After you select an image
+        a cube will be created and immediately downloaded.
       </p>
-      <p>The maximum file size accepted is ${limit} MB</p>
+      <p>The maximum file size accepted is ${limit} MB.</p>
       <p>See some cubes at the <a target="_blank" href="http://imgur.com/a/iTPwP">cube gallery (imgur) ... </a></p>
 
     """
