@@ -76,7 +76,7 @@ $content
 
   def home: String = {
     s"""
-        <p><a href="start">back to start ...</a></p>
+        <p><a href="/">back to start ...</a></p>
   """
   }
 
