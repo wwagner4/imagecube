@@ -10,7 +10,6 @@ import ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 
-
 case class Img(
                 partLen: Int,
                 center: Seq[Seq[Int]],
@@ -52,17 +51,19 @@ case class Size(
                  w: Int,
                  h: Int
                )
-               
+
 sealed trait RUNMODE
+
 case object RUNMODE_Seq extends RUNMODE
+
 case class RUNMODE_Parallel(timeout: Duration) extends RUNMODE
 
 object Imagecube {
-  
+
   def transformImage(in: InputStream, inMime: String, outMime: String, runMode: RUNMODE): Array[Byte] = {
     val bi = readImage(in, inMime)
-    in.close
-    val img = readImage(bi)  
+    in.close()
+    val img = readImage(bi)
     val shortImg = runMode match {
       case RUNMODE_Seq => shortenImgSeq(img)
       case RUNMODE_Parallel(timeout) => shortenImgPar(img, timeout)
@@ -412,27 +413,27 @@ object Imagecube {
 
     bi
   }
-  
+
   def writeImage(bi: BufferedImage, mimeType: String): Array[Byte] = {
     import scala.collection.JavaConverters._
 
     val os = new ByteArrayOutputStream()
     val writers = ImageIO.getImageWritersByMIMEType(mimeType).asScala.toList
-    val wrt = if (!writers.isEmpty) writers(0) else throw new IllegalStateException(s"Unknown image mime type'$mimeType'") 
-    val ios = ImageIO.createImageOutputStream(os);
-    wrt.setOutput(ios);
-    wrt.write(bi);
-    os.close();
+    val wrt = if (writers.nonEmpty) writers(0) else throw new IllegalStateException(s"Unknown image mime type'$mimeType'")
+    val ios = ImageIO.createImageOutputStream(os)
+    wrt.setOutput(ios)
+    wrt.write(bi)
+    os.close()
     os.toByteArray
   }
-  
+
   def readImage(in: InputStream, mimeType: String): BufferedImage = {
     import scala.collection.JavaConverters._
-    
+
     val readers = ImageIO.getImageReadersByMIMEType(mimeType).asScala.toList
-    val reader = if (!readers.isEmpty) readers(0) else throw new IllegalStateException(s"Unknown image mime type'$mimeType'")   
-    val iis=ImageIO.createImageInputStream(in);
-    reader.setInput(iis);
+    val reader = if (readers.nonEmpty) readers(0) else throw new IllegalStateException(s"Unknown image mime type'$mimeType'")
+    val iis = ImageIO.createImageInputStream(in)
+    reader.setInput(iis)
     reader.read(reader.getMinIndex)
   }
 
@@ -442,7 +443,7 @@ object Imagecube {
   def extractName(f: File): String = {
     val i = f.getName.lastIndexOf('.')
     if (i < 0) f.getName
-    else f.getName().substring(0, i)
+    else f.getName.substring(0, i)
   }
 
 
