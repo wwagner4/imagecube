@@ -22,7 +22,7 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
       templ(contentError(s"The image you uploaded exceeded the $limit MB limit."), BGCOL_alarm)
   }
 
-  get("/") {
+  get("/start") {
     contentType = "text/html"
 
     val content =

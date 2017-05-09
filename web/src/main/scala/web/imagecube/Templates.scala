@@ -1,13 +1,21 @@
 package web.imagecube
 
-sealed trait BGCOL { def txt: String }
-case object BGCOL_normal extends BGCOL {def txt = "#ff9933"}
-case object BGCOL_alarm extends BGCOL {def txt = "#ff8533"}
+sealed trait BGCOL {
+  def txt: String
+}
+
+case object BGCOL_normal extends BGCOL {
+  def txt = "#ff9933"
+}
+
+case object BGCOL_alarm extends BGCOL {
+  def txt = "#ff8533"
+}
 
 object Templates {
-  
- def templ(content: String, bg: BGCOL, additionalHeaderContent: String = ""): String = {
-       s"""
+
+  def templ(content: String, bg: BGCOL, additionalHeaderContent: String = ""): String = {
+    s"""
 <html>
 <head>
 <title>imagecube</title>
@@ -64,19 +72,19 @@ $content
 </body>
 </html>  
    """
- }
-  
-def home: String = {
-  s"""
-        <p><a href="/">back to start ...</a></p>
-  """
-}
+  }
 
-def contentError(text: String): String = {
-  s"""
+  def home: String = {
+    s"""
+        <p><a href="/start">back to start ...</a></p>
+  """
+  }
+
+  def contentError(text: String): String = {
+    s"""
           <p  class="b">$text</p>
         $home
   """
-}
-  
+  }
+
 }
