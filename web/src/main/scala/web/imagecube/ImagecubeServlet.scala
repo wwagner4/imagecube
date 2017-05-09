@@ -42,7 +42,9 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
         a cube will be created and immediately downloaded.
       </p>
       <p>The maximum file size accepted is ${limit} MB.</p>
-      <p>See some cubes at the <a target="_blank" href="https://drive.google.com/drive/folders/0Bz0j9ff8RfpPM2t0RDh1VnhCdEk?usp=sharing">cube gallery ... </a></p>
+      <p>
+      <a data-flickr-embed="true"  href="https://www.flickr.com/photos/148922320@N05/albums/72157680842147822" title="imagecube"><img src="https://c1.staticflickr.com/5/4182/34500371176_d564fcaae1_z.jpg" width="640" height="555" alt="imagecube"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script>
+      </p>
 
     """
     templ(content, BGCOL_normal)
