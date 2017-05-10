@@ -29,7 +29,7 @@ object Tryout extends App {
 
   def runDir(): Unit = {
 
-    def writeImage(f: File, outDir: File, runMode: RUNMODE): Unit = {
+    def writeImage(f: File, outDir: File): Unit = {
       try {
         val biIn = ImageIO.read(f)
         if (biIn == null) throw new IllegalStateException(s"$f seems not to contain image data")
@@ -53,15 +53,13 @@ object Tryout extends App {
     if (!inDir.exists()) throw new IllegalStateException(s"Input directory '$inDir' does not exist")
 
     val outDir = new File(homeDir, "tmp/cubes/out")
-    //val runMode = RUNMODE_Parallel(Duration(20, SECONDS))
-    val runMode = RUNMODE_Seq
 
     outDir.mkdirs()
     val files = inDir.listFiles()
     val start = System.nanoTime()
     files.foreach { f =>
       if (f.isFile) {
-        writeImage(f, outDir, runMode)
+        writeImage(f, outDir)
       }
     }
     val stop = System.nanoTime()
@@ -70,34 +68,7 @@ object Tryout extends App {
 
   }
 
-  def readWriteStream(): Unit = {
-
-    def transformImage(in: InputStream, inMime: String, outMime: String, runMode: RUNMODE): Array[Byte] = {
-      val bi = readImageFromStream(in, inMime)
-      in.close()
-      val img = readImage(bi)
-      val shortImg = runMode match {
-        case RUNMODE_Seq => shortenImgSeq(img)
-        case RUNMODE_Parallel(timeout) => shortenImgPar(img, timeout)
-      }
-      val biOut = createImage(shortImg, percent(img.partLen, 20), runMode)
-      writeImageToByteArray(biOut, outMime)
-    }
-
-    val runMode = RUNMODE_Seq
-    val fNam = "cow.jpg"
-    val f = new File(dir, fNam)
-    val in = new FileInputStream(f)
-
-    val bytes = transformImage(in, "image/jpeg", "image/png", runMode)
-
-    val out = new File(tmpdir, "so_cow.png")
-    val target = new BufferedOutputStream(new FileOutputStream(out))
-    try bytes.foreach(target.write(_)) finally target.close()
-    println(s"wrote to $out")
-  }
-
-  def runExtractName(): Unit = {
+    def runExtractName(): Unit = {
     Seq(
       new File("a/b/c.png"),
       new File("a/b/c"),
