@@ -4,6 +4,7 @@ import org.scalatra._
 import org.scalatra.servlet.{MultipartConfig, SizeConstraintExceededException, FileUploadSupport}
 
 import imagecube.Imagecube._
+import web.imagecube.Templates._
 
 class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with FlashMapSupport {
 
