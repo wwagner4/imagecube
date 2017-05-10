@@ -4,7 +4,7 @@ import java.awt.Color
 import java.io._
 import javax.imageio._
 
-import Imagecube._
+import imagecube.Imagecube._
 
 
 object Tryout extends App {
@@ -266,7 +266,7 @@ object Tryout extends App {
     }
 
     import scala.concurrent._
-    import ExecutionContext.Implicits.global
+    import scala.concurrent.ExecutionContext.Implicits.global
     import scala.concurrent.duration._
 
     val f1 = Future {

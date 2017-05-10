@@ -1,8 +1,7 @@
 package web.imagecube
 
 import org.scalatra._
-import servlet.{MultipartConfig, SizeConstraintExceededException, FileUploadSupport}
-import Templates._
+import org.scalatra.servlet.{MultipartConfig, SizeConstraintExceededException, FileUploadSupport}
 
 import imagecube.Imagecube._
 
@@ -10,7 +9,7 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
 
   val limit = 1
 
-  configureMultipartHandling(MultipartConfig(maxFileSize = Some(limit * 1024 * 1024)))
+  configureMultipartHandling(MultipartConfig.apply(maxFileSize = Some.apply(limit * 1024 * 1024)))
 
   error {
     case _: SizeConstraintExceededException =>
@@ -54,7 +53,7 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
           try {
             val mime = file.contentType.getOrElse("application/octet-stream")
             val transformed = transformImageWeb(file.getInputStream, mime, mime)
-            Ok(transformed, Map(
+            Ok.apply(transformed, Map.apply(
               "Content-Type" -> mime,
               "Content-Disposition" -> ("attachment; filename=\"" + file.name + "\"")
             ))

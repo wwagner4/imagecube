@@ -1,7 +1,7 @@
 package imagecube
 
 import org.scalatest.FunSuite
-import Imagecube._
+import imagecube.Imagecube._
 
 class ImagecubeSuite extends FunSuite {
 
