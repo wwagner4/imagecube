@@ -4,15 +4,11 @@ import org.scalatra._
 import servlet.{MultipartConfig, SizeConstraintExceededException, FileUploadSupport}
 import Templates._
 
-import imagecube._
 import imagecube.Imagecube._
-
-import scala.concurrent.duration._
 
 class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with FlashMapSupport {
 
   val limit = 1
-  val runmode = RUNMODE_Parallel(Duration(30, SECONDS))
 
   configureMultipartHandling(MultipartConfig(maxFileSize = Some(limit * 1024 * 1024)))
 
@@ -57,7 +53,7 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
         } else {
           try {
             val mime = file.contentType.getOrElse("application/octet-stream")
-            val transformed = transformImage(file.getInputStream, mime, mime, runmode)
+            val transformed = transformImageWeb(file.getInputStream, mime, mime)
             Ok(transformed, Map(
               "Content-Type" -> mime,
               "Content-Disposition" -> ("attachment; filename=\"" + file.name + "\"")
