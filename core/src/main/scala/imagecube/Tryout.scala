@@ -2,10 +2,12 @@ package imagecube
 
 import java.awt.Color
 import java.io._
-
 import javax.imageio._
 
 import Imagecube._
+
+import scala.concurrent.duration._
+import scala.concurrent.duration.Duration._
 
 
 object Tryout extends App {
@@ -39,7 +41,7 @@ object Tryout extends App {
           case RUNMODE_Seq => shortenImgSeq(img)
           case RUNMODE_Parallel(timeout) => shortenImgPar(img, timeout)
         }
-        val biOut = createImage(shortImg, percent(img.partLen, 20))
+        val biOut = createImage(shortImg, percent(img.partLen, 20), runMode)
         val fOutName = s"${extractName(f)}_out.png"
         val outFile = new File(outDir, fOutName)
         val typ = imageType(outFile)
@@ -51,8 +53,15 @@ object Tryout extends App {
       }
     }
 
-    val inDir = new File("/Users/wwagner4/tmp/cubes/in")
-    val outDir = new File("/Users/wwagner4/tmp/cubes/out")
+    val homeDirStr = System.getProperty("user.home")
+    val homeDir = new File(homeDirStr)
+
+
+    val inDir = new File(homeDir, "tmp/cubes/in")
+    if (!inDir.exists()) throw new IllegalStateException(s"Input directory '$inDir' does not exist")
+
+    val outDir = new File(homeDir, "tmp/cubes/out")
+    //val runMode = RUNMODE_Parallel(Duration(20, SECONDS))
     val runMode = RUNMODE_Seq
 
     outDir.mkdirs()
@@ -79,7 +88,7 @@ object Tryout extends App {
         case RUNMODE_Seq => shortenImgSeq(img)
         case RUNMODE_Parallel(timeout) => shortenImgPar(img, timeout)
       }
-      val biOut = createImage(shortImg, percent(img.partLen, 20))
+      val biOut = createImage(shortImg, percent(img.partLen, 20), runMode)
       writeImage(biOut, outMime)
     }
 

@@ -68,7 +68,7 @@ object Imagecube {
       case RUNMODE_Seq => shortenImgSeq(img)
       case RUNMODE_Parallel(timeout) => shortenImgPar(img, timeout)
     }
-    val biOut = createImage(shortImg, percent(img.partLen, 20))
+    val biOut = createImage(shortImg, percent(img.partLen, 20), runMode)
     writeImage(biOut, outMime)
   }
 
@@ -91,7 +91,6 @@ object Imagecube {
   def readImage(bi: BufferedImage): Img = {
 
     def readImage(bi: BufferedImage, x: Range, y: Range): Seq[Seq[Int]] = {
-      println(s"readImage $x $y")
 
       def readRow(j: Int, r: Range): Seq[Int] = {
         for (i <- r.from to r.to) yield {
@@ -105,7 +104,6 @@ object Imagecube {
     }
 
     def readImageTransp(bi: BufferedImage, x: Range, y: Range): Seq[Seq[Int]] = {
-      println(s"readImageTransp $x $y")
 
       def readRow(j: Int, r: Range): Seq[Int] = {
         for (i <- r.to to r.from) yield {
@@ -120,9 +118,8 @@ object Imagecube {
 
     val w = bi.getWidth()
     val h = bi.getHeight()
-    println(s"readImage $w $h")
+    println(s"reading image $w $h")
     val p = cutParams(w, h)
-    println(s"readImage $p")
     val (xrLeft, yrLeft) = transposeParamsLeft(p)
     val (xrRight, yrRight) = transposeParamsRight(p)
     Img(
@@ -139,25 +136,25 @@ object Imagecube {
     Img(
       img.partLen,
       img.center,
-      shortenImagePartSeq(img.left),
-      shortenImagePartSeq(img.right.reverse).reverse,
-      shortenImagePartSeq(img.top),
-      shortenImagePartSeq(img.bottom.reverse).reverse
+      shortenImagePartSeq("L", img.left),
+      shortenImagePartSeq("R", img.right.reverse).reverse,
+      shortenImagePartSeq("T", img.top),
+      shortenImagePartSeq("B", img.bottom.reverse).reverse
     )
   }
 
   def shortenImgPar(img: Img, timeout: Duration): Img = {
     val fLeft = Future {
-      shortenImagePartPar(img.left, timeout)
+      shortenImagePartPar("L", img.left, timeout)
     }
     val fRight = Future {
-      shortenImagePartPar(img.right.reverse, timeout).reverse
+      shortenImagePartPar("R", img.right.reverse, timeout).reverse
     }
     val fTop = Future {
-      shortenImagePartPar(img.top, timeout)
+      shortenImagePartPar("T", img.top, timeout)
     }
     val fBottom = Future {
-      shortenImagePartPar(img.bottom.reverse, timeout).reverse
+      shortenImagePartPar("B", img.bottom.reverse, timeout).reverse
     }
     val r = for (rLeft <- fLeft; rRight <- fRight; rTop <- fTop; rBottom <- fBottom)
       yield (rLeft, rRight, rTop, rBottom)
@@ -242,26 +239,29 @@ object Imagecube {
     else transpose(cutParams(height, width))
   }
 
-  def shortenImagePartSeq(part: Seq[Seq[Int]]): Seq[Seq[Int]] = {
-    val newRowsA = shortenRowsA(part)
-    val newRowsB = shortenRowsB(part)
+  def shortenImagePartSeq(partId: String, part: Seq[Seq[Int]]): Seq[Seq[Int]] = {
+    val newRowsA = shortenRowsA(partId, part)
+    val newRowsB = shortenRowsB(partId, part)
     newRowsA.zip(newRowsB).map { case (a, b) => a ++ b }
   }
 
-  def shortenImagePartPar(part: Seq[Seq[Int]], timeout: Duration): Seq[Seq[Int]] = {
+  def shortenImagePartPar(partId: String, part: Seq[Seq[Int]], timeout: Duration): Seq[Seq[Int]] = {
+
+    println(s"shorten part $partId")
 
     val fRowsA = Future {
-      shortenRowsA(part)
+      shortenRowsA(partId, part)
     }
     val fRowsB = Future {
-      shortenRowsB(part)
+      shortenRowsB(partId, part)
     }
     val r = for (rRowsA <- fRowsA; rRowsB <- fRowsB) yield (rRowsA, rRowsB)
     val (newRowsA, newRowsB) = Await.result(r, timeout)
     newRowsA.zip(newRowsB).map { case (a, b) => a ++ b }
   }
 
-  def shortenRowsA(part: Seq[Seq[Int]]): Seq[Seq[Int]] = {
+  def shortenRowsA(partId: String, part: Seq[Seq[Int]]): Seq[Seq[Int]] = {
+    println(s"shorten $partId A")
     part.zipWithIndex.map { case (row, i) =>
       val n = part.size
       val (from, to) = shortenA(i, n)
@@ -272,7 +272,8 @@ object Imagecube {
     }
   }
 
-  def shortenRowsB(part: Seq[Seq[Int]]): Seq[Seq[Int]] = {
+  def shortenRowsB(partId: String, part: Seq[Seq[Int]]): Seq[Seq[Int]] = {
+    println(s"shorten $partId B")
     part.zipWithIndex.map { case (row, i) =>
       val n = part.size
       val (from, to) = shortenB(i, n)
@@ -312,9 +313,10 @@ object Imagecube {
     }
   }
 
-  def createImage(img: Img, border: Int): BufferedImage = {
+  def createImage(img: Img, border: Int, runMode: RUNMODE): BufferedImage = {
 
-    def writeImagePart(bi: BufferedImage, imgPart: Seq[Seq[Int]], pos: Pos): Unit = {
+    def writeImagePart(partId: String, bi: BufferedImage, imgPart: Seq[Seq[Int]], pos: Pos): Unit = {
+      println(s"writeImagePart $partId")
       imgPart.zipWithIndex.foreach {
         case (row, i) => row.zipWithIndex.foreach {
           case (col, j) => bi.setRGB(pos.x + j, pos.y + i, col)
@@ -322,7 +324,8 @@ object Imagecube {
       }
     }
 
-    def writeImagePartTransp(bi: BufferedImage, imgPart: Seq[Seq[Int]], pos: Pos): Unit = {
+    def writeImagePartTransp(partId: String, bi: BufferedImage, imgPart: Seq[Seq[Int]], pos: Pos): Unit = {
+      println(s"writeImagePart transp $partId")
       imgPart.zipWithIndex.foreach {
         case (row, i) => row.zipWithIndex.foreach {
           case (col, j) => bi.setRGB(pos.x + i, pos.y + j, col)
@@ -398,16 +401,35 @@ object Imagecube {
       drawFlapHorUp(P(2 * l, l))
     }
 
+    def writeImagePartsSeq(bi: BufferedImage, pos: PartsPositions): Unit = {
+      writeImagePart("C", bi, img.center, pos.center)
+      writeImagePartTransp("L", bi, img.left, pos.left)
+      writeImagePartTransp("R", bi, img.right, pos.right)
+      writeImagePart("T", bi, img.top, pos.top)
+      writeImagePart("B", bi, img.bottom, pos.bottom)
+    }
+
+    def writeImagePartsPar(bi: BufferedImage, pos: PartsPositions, timeout: Duration): Unit = {
+      val fc = Future(writeImagePart("C", bi, img.center, pos.center))
+      val fl = Future(writeImagePartTransp("L", bi, img.left, pos.left))
+      val fr = Future(writeImagePartTransp("R", bi, img.right, pos.right))
+      val ft = Future(writeImagePart("T", bi, img.top, pos.top))
+      val fb = Future(writeImagePart("B", bi, img.bottom, pos.bottom))
+      val r = for(rc <- fc; rl <- fl; rr <- fr; rt <- ft; rb <- fb) yield (rc, rl, rr, rt, rb)
+      Await.ready(r, timeout)
+     }
+
     val size = imageSize(img.partLen, border)
     val bi = new BufferedImage(size.w, size.h, BufferedImage.TYPE_INT_RGB)
-    writeBackground(bi)
     val pos = partPositions(img.partLen, border)
 
-    writeImagePart(bi, img.center, pos.center)
-    writeImagePartTransp(bi, img.left, pos.left)
-    writeImagePartTransp(bi, img.right, pos.right)
-    writeImagePart(bi, img.top, pos.top)
-    writeImagePart(bi, img.bottom, pos.bottom)
+    writeBackground(bi)
+
+    runMode match {
+      case RUNMODE_Seq => writeImagePartsSeq(bi, pos)
+      case RUNMODE_Parallel(timeout) => writeImagePartsPar(bi, pos, timeout)
+    }
+    writeImagePartsSeq(bi, pos)
 
     writeLines(bi, img.partLen, border, percent(img.partLen, 15))
 
