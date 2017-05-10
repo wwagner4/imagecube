@@ -6,9 +6,6 @@ import javax.imageio._
 
 import Imagecube._
 
-import scala.concurrent.duration._
-import scala.concurrent.duration.Duration._
-
 
 object Tryout extends App {
 
@@ -24,7 +21,7 @@ object Tryout extends App {
   // shorten1()
   // positionParts()
   // parallel()
-  // perc()
+  // percent()
   // runExtractName()
   // runTestImages()
   // readWriteStream()
@@ -36,12 +33,7 @@ object Tryout extends App {
       try {
         val biIn = ImageIO.read(f)
         if (biIn == null) throw new IllegalStateException(s"$f seems not to contain image data")
-        val img = readImage(biIn)
-        val shortImg = runMode match {
-          case RUNMODE_Seq => shortenImgSeq(img)
-          case RUNMODE_Parallel(timeout) => shortenImgPar(img, timeout)
-        }
-        val biOut = createImage(shortImg, percent(img.partLen, 20), runMode)
+        val biOut = transformImage(biIn)
         val fOutName = s"${extractName(f)}_out.png"
         val outFile = new File(outDir, fOutName)
         val typ = imageType(outFile)
@@ -81,7 +73,7 @@ object Tryout extends App {
   def readWriteStream(): Unit = {
 
     def transformImage(in: InputStream, inMime: String, outMime: String, runMode: RUNMODE): Array[Byte] = {
-      val bi = readImage(in, inMime)
+      val bi = readImageFromStream(in, inMime)
       in.close()
       val img = readImage(bi)
       val shortImg = runMode match {
@@ -89,7 +81,7 @@ object Tryout extends App {
         case RUNMODE_Parallel(timeout) => shortenImgPar(img, timeout)
       }
       val biOut = createImage(shortImg, percent(img.partLen, 20), runMode)
-      writeImage(biOut, outMime)
+      writeImageToByteArray(biOut, outMime)
     }
 
     val runMode = RUNMODE_Seq

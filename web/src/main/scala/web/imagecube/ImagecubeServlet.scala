@@ -57,7 +57,7 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
         } else {
           try {
             val mime = file.contentType.getOrElse("application/octet-stream")
-            val transformed = transformImage(file.getInputStream, mime, mime, runmode)
+            val transformed = transformImageWeb(file.getInputStream, mime, mime)
             Ok(transformed, Map(
               "Content-Type" -> mime,
               "Content-Disposition" -> ("attachment; filename=\"" + file.name + "\"")
