@@ -49,7 +49,7 @@ object Imagecube {
   }
 
   def transformImage(bi: BufferedImage): BufferedImage = {
-    val border = 20
+    val border = 30
 
     val w = bi.getWidth()
     val h = bi.getHeight()
@@ -59,9 +59,9 @@ object Imagecube {
     val (xrRight, yrRight) = transposeParamsRight(p)
     val partLen = p.partLen
 
-    val size = imageSize(partLen, border)
+    val size = imageSize(partLen, percent(partLen, border))
     val bo = new BufferedImage(size.w, size.h, BufferedImage.TYPE_INT_RGB)
-    val pos: PartsPositions = partPositions(partLen, border)
+    val pos: PartsPositions = partPositions(partLen, percent(partLen, border))
 
     def readImage(bimg: BufferedImage, x: Range, y: Range): Seq[Seq[Int]] = {
 
@@ -215,7 +215,7 @@ object Imagecube {
 
     processParSeq()
 
-    writeLines(g, partLen, border, percent(partLen, 15))
+    writeLines(g, partLen, percent(partLen, border), percent(partLen, 15))
 
     bo
   }
