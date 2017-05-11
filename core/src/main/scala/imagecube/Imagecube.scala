@@ -39,16 +39,22 @@ case class Size(
                  h: Int
                )
 
+sealed trait HANDED
+
+case object HANDED_Right extends HANDED
+
+case object HANDED_Left extends HANDED
+
 object Imagecube {
 
   def transformImageWeb(in: InputStream, inMime: String, outMime: String): Array[Byte] = {
     val bi = readImageFromStream(in, inMime)
     in.close()
-    val bo = transformImage(bi)
+    val bo = transformImage(bi, HANDED_Right)
     writeImageToByteArray(bo, outMime)
   }
 
-  def transformImage(bi: BufferedImage): BufferedImage = {
+  def transformImage(bi: BufferedImage, handed: HANDED): BufferedImage = {
     val border = 30
 
     val w = bi.getWidth()
@@ -159,13 +165,25 @@ object Imagecube {
       g.setColor(Color.BLACK)
 
       drawBackground()
-      drawFlapVertLeft(P(l, 0))
-      drawFlapHorDown(P(0, 2 * l))
+
+
+      handed match {
+        case HANDED_Right =>
+          drawFlapVertRight(P(2 * l, 0))
+          drawFlapHorUp(P(0, l))
+          drawFlapVertLeft(P(l, 2 * l))
+          drawFlapHorDown(P(2 * l, 2 * l))
+        case HANDED_Left =>
+          drawFlapVertLeft(P(l, 0))
+          drawFlapHorDown(P(0, 2 * l))
+          drawFlapVertRight(P(2 * l, 2 * l))
+          drawFlapHorUp(P(2 * l, l))
+      }
+
+
       drawFlapVertLeft(P(l, 3 * l))
       drawFlapHorDown(P(l, 4 * l))
       drawFlapVertRight(P(2 * l, 3 * l))
-      drawFlapVertRight(P(2 * l, 2 * l))
-      drawFlapHorUp(P(2 * l, l))
     }
 
 
