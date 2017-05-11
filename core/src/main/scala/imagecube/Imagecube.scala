@@ -39,17 +39,23 @@ case class Size(
                  h: Int
                )
 
+sealed trait HANDED
+
+case object HANDED_Right extends HANDED
+
+case object HANDED_Left extends HANDED
+
 object Imagecube {
 
   def transformImageWeb(in: InputStream, inMime: String, outMime: String): Array[Byte] = {
     val bi = readImageFromStream(in, inMime)
     in.close()
-    val bo = transformImage(bi)
+    val bo = transformImage(bi, HANDED_Right)
     writeImageToByteArray(bo, outMime)
   }
 
-  def transformImage(bi: BufferedImage): BufferedImage = {
-    val border = 20
+  def transformImage(bi: BufferedImage, handed: HANDED): BufferedImage = {
+    val border = 30
 
     val w = bi.getWidth()
     val h = bi.getHeight()
@@ -59,9 +65,9 @@ object Imagecube {
     val (xrRight, yrRight) = transposeParamsRight(p)
     val partLen = p.partLen
 
-    val size = imageSize(partLen, border)
+    val size = imageSize(partLen, percent(partLen, border))
     val bo = new BufferedImage(size.w, size.h, BufferedImage.TYPE_INT_RGB)
-    val pos: PartsPositions = partPositions(partLen, border)
+    val pos: PartsPositions = partPositions(partLen, percent(partLen, border))
 
     def readImage(bimg: BufferedImage, x: Range, y: Range): Seq[Seq[Int]] = {
 
@@ -159,13 +165,25 @@ object Imagecube {
       g.setColor(Color.BLACK)
 
       drawBackground()
-      drawFlapVertLeft(P(l, 0))
-      drawFlapHorDown(P(0, 2 * l))
+
+
+      handed match {
+        case HANDED_Right =>
+          drawFlapVertRight(P(2 * l, 0))
+          drawFlapHorUp(P(0, l))
+          drawFlapVertLeft(P(l, 2 * l))
+          drawFlapHorDown(P(2 * l, 2 * l))
+        case HANDED_Left =>
+          drawFlapVertLeft(P(l, 0))
+          drawFlapHorDown(P(0, 2 * l))
+          drawFlapVertRight(P(2 * l, 2 * l))
+          drawFlapHorUp(P(2 * l, l))
+      }
+
+
       drawFlapVertLeft(P(l, 3 * l))
       drawFlapHorDown(P(l, 4 * l))
       drawFlapVertRight(P(2 * l, 3 * l))
-      drawFlapVertRight(P(2 * l, 2 * l))
-      drawFlapHorUp(P(2 * l, l))
     }
 
 
@@ -215,7 +233,7 @@ object Imagecube {
 
     processParSeq()
 
-    writeLines(g, partLen, border, percent(partLen, 15))
+    writeLines(g, partLen, percent(partLen, border), percent(partLen, 15))
 
     bo
   }
