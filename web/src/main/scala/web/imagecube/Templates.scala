@@ -74,16 +74,16 @@ $content
    """
   }
 
-  def home: String = {
+  def home(homeUrl: String): String = {
     s"""
-        <p><a href="/">back to start ...</a></p>
+        <p><a href="$homeUrl">back to start ...</a></p>
   """
   }
 
-  def contentError(text: String): String = {
+  def contentError(text: String, homeUrl: String): String = {
     s"""
           <p  class="b">$text</p>
-        $home
+        ${home(homeUrl)}
   """
   }
 

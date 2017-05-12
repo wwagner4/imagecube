@@ -15,16 +15,16 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
   error {
     case _: SizeConstraintExceededException =>
       contentType = "text/html"
-      templ(contentError(s"The image you uploaded exceeded the $limit MB limit."), BGCOL_alarm)
+      templ(contentError(s"The image you uploaded exceeded the $limit MB limit.", url("/start")), BGCOL_alarm)
   }
 
-  get("/") {
+  get("/start") {
     contentType = "text/html"
 
     val content =
       s"""
       <p>Transform your images to cubes</p>
-      <form id="myForm" action="upload" method="post" enctype="multipart/form-data">
+      <form id="myForm" action="${url("/upload")}" method="post" enctype="multipart/form-data">
        <p>
 
        <label for="file-upload" class="button">Select an image</label>
@@ -45,11 +45,11 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
     templ(content, BGCOL_normal)
   }
   post("/upload") {
-    contentType = "text/html"
     fileParams.get("file") match {
       case Some(file) =>
         if (file.getSize == 0) {
-          templ(contentError("Hey! You forgot to select a file"), BGCOL_alarm)
+          contentType = "text/html"
+          templ(contentError("Hey! You forgot to select a file", url("/start")), BGCOL_alarm)
         } else {
           try {
             val mime = file.contentType.getOrElse("application/octet-stream")
@@ -60,12 +60,14 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
             ))
           } catch {
             case e: Exception =>
+              contentType = "text/html"
               e.printStackTrace()
-              templ(contentError(s"Error transforming file: ${e.getMessage}"), BGCOL_alarm)
+              templ(contentError(s"Error transforming file: ${e.getMessage}", url("/start")), BGCOL_alarm)
           }
         }
       case None =>
-        templ(contentError("Hey! You forgot to select a file"), BGCOL_alarm)
+        contentType = "text/html"
+        templ(contentError("Hey! You forgot to select a file", url("/start")), BGCOL_alarm)
     }
   }
 
