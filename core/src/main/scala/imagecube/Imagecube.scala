@@ -50,11 +50,11 @@ object Imagecube {
   def transformImageWeb(in: InputStream, inMime: String, outMime: String): Array[Byte] = {
     val bi = readImageFromStream(in, inMime)
     in.close()
-    val bo = transformImage(bi, HANDED_Right)
+    val bo = transformImage(bi, HANDED_Right, true)
     writeImageToByteArray(bo, outMime)
   }
 
-  def transformImage(bi: BufferedImage, handed: HANDED): BufferedImage = {
+  def transformImage(bi: BufferedImage, handed: HANDED, cutLines: Boolean): BufferedImage = {
     val border = 30
 
     val w = bi.getWidth()
@@ -125,12 +125,21 @@ object Imagecube {
         }
       }
 
-      def drawBackground(): Unit = {
+      def drawBack(): Unit = {
         val p = Seq(P(0, 0), P(0, l - 1), P(l - 1, l - 1), P(l - 1, 0))
           .map(_.add(P(b, b)))
           .map(_.add(P(l, 3 * l)))
         drawPoli(p)
       }
+
+      def drawCutLines(): Unit = {
+        val p = Seq(P(l, 0), P(2 * l, 0), P(2 * l, l), P(3 * l, l),
+          P(3 * l, 2 * l), P(2 * l, 2 * l), P(2 * l, 3 * l), P(l, 3 * l),
+          P(l, 2 * l), P(0, 2 * l), P(0, l), P(l, l), P(l, 0))
+          .map(_.add(P(b, b)))
+        drawPoli(p)
+      }
+
 
       def drawFlapVertRight(off: P): Unit = {
         val p = Seq(P(0, 0), P(d, d), P(d, l - d), P(0, l))
@@ -164,8 +173,8 @@ object Imagecube {
 
       g.setColor(Color.BLACK)
 
-      drawBackground()
-
+      drawBack()
+      if (cutLines) drawCutLines()
 
       handed match {
         case HANDED_Right =>
