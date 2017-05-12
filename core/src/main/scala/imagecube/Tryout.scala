@@ -29,11 +29,11 @@ object Tryout extends App {
 
   def runDir(): Unit = {
 
-    def writeImage(f: File, outDir: File, handed: HANDED): Unit = {
+    def writeImage(f: File, outDir: File, handed: HANDED, cutLines: Boolean): Unit = {
       try {
         val biIn = ImageIO.read(f)
         if (biIn == null) throw new IllegalStateException(s"$f seems not to contain image data")
-        val biOut = transformImage(biIn, handed)
+        val biOut = transformImage(biIn, handed, cutLines)
         val fOutName = s"${extractName(f)}_out.png"
         val outFile = new File(outDir, fOutName)
         val typ = imageType(outFile)
@@ -48,6 +48,7 @@ object Tryout extends App {
     val inDirPath = "tmp/cubes/in"
     val outDirPath = "tmp/cubes/out"
     val handed = HANDED_Right
+    val cutLines = true
 
     val homeDirStr = System.getProperty("user.home")
     val homeDir = new File(homeDirStr)
@@ -59,7 +60,7 @@ object Tryout extends App {
     val start = System.nanoTime()
     files.foreach { f =>
       if (f.isFile) {
-        writeImage(f, outDir, handed)
+        writeImage(f, outDir, handed, cutLines)
       }
     }
     val stop = System.nanoTime()
