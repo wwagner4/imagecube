@@ -96,21 +96,23 @@ object Imagecube {
     }
 
     def writeImagePart(partId: String, bimg: BufferedImage, imgPart: Seq[Seq[Int]], pos: Pos): Unit = {
-      println(s"writeImagePart $partId")
+      println(s" >> writeImagePart $partId")
       imgPart.zipWithIndex.foreach {
         case (row, i) => row.zipWithIndex.foreach {
           case (col, j) => bimg.setRGB(pos.x + j, pos.y + i, col)
         }
       }
+      println(s" << writeImagePart $partId")
     }
 
     def writeImagePartTransp(partId: String, bimg: BufferedImage, imgPart: Seq[Seq[Int]], pos: Pos): Unit = {
-      println(s"writeImagePart transp $partId")
+      println(s" >> writeImagePart transp $partId")
       imgPart.zipWithIndex.foreach {
         case (row, i) => row.zipWithIndex.foreach {
           case (col, j) => bimg.setRGB(pos.x + i, pos.y + j, col)
         }
       }
+      println(s" << writeImagePart transp $partId")
     }
 
     def writeLines(g: Graphics2D, l: Int, b: Int, d: Int): Unit = {
@@ -346,8 +348,8 @@ object Imagecube {
   }
 
   def shortenRowsA(partId: String, part: Seq[Seq[Int]]): Seq[Seq[Int]] = {
-    println(s"shorten $partId A")
-    part.zipWithIndex.map { case (row, i) =>
+    println(s" >> shorten $partId A")
+    val re = part.zipWithIndex.map { case (row, i) =>
       val n = part.size
       val (from, to) = shortenA(i, n)
       val filteredCol = row.zipWithIndex
@@ -355,11 +357,13 @@ object Imagecube {
         .map { case (c, _) => c }
       linearCompress(filteredCol, n / 2, colorMix)
     }
+    println(s" << shorten $partId A")
+    re
   }
 
   def shortenRowsB(partId: String, part: Seq[Seq[Int]]): Seq[Seq[Int]] = {
-    println(s"shorten $partId B")
-    part.zipWithIndex.map { case (row, i) =>
+    println(s" >> shorten $partId B")
+    val re = part.zipWithIndex.map { case (row, i) =>
       val n = part.size
       val (from, to) = shortenB(i, n)
       val filteredCol = row.zipWithIndex
@@ -368,6 +372,8 @@ object Imagecube {
       val m = if (n % 2 == 0) n / 2 else n / 2 + 1
       linearCompress(filteredCol, m, colorMix)
     }
+    println(s" << shorten $partId B")
+    re
   }
 
   def shortenA(i: Int, n: Int): (Int, Int) = {
