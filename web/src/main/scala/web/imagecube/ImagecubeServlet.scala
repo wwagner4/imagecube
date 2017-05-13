@@ -1,30 +1,29 @@
 package web.imagecube
 
 import org.scalatra._
-import org.scalatra.servlet.{MultipartConfig, SizeConstraintExceededException, FileUploadSupport}
+import org.scalatra.servlet.{FileUploadSupport}
 
 import imagecube.Imagecube._
 import web.imagecube.Templates._
 
 class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with FlashMapSupport {
 
-  val limit = 1
+  val limit = 1000
 
-  configureMultipartHandling(MultipartConfig.apply(maxFileSize = Some.apply(limit * 1024 * 1024)))
+  val ctx = "/imagecube"
+  //val ctx = ""
 
-  error {
-    case _: SizeConstraintExceededException =>
-      contentType = "text/html"
-      templ(contentError(s"The image you uploaded exceeded the $limit MB limit.", url("/start")), BGCOL_alarm)
-  }
+  val uploadUrlStr = "/upload"
+  val startUrlStr = "/"
 
-  get("/start") {
+  get("/") {
     contentType = "text/html"
+    val uploadUrl = s"$ctx$uploadUrlStr"
 
     val content =
       s"""
       <p>Transform your images to cubes</p>
-      <form id="myForm" action="${url("/upload")}" method="post" enctype="multipart/form-data">
+      <form id="myForm" action="$uploadUrl" method="post" enctype="multipart/form-data">
        <p>
 
        <label for="file-upload" class="button">Select an image</label>
@@ -36,7 +35,7 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
         After you select an image
         a cube will be created and immediately downloaded.
       </p>
-      <p>The maximum file size accepted is $limit MB.</p>
+      <p>The maximum image size accepted is $limit k pixel</p>
       <p>
       <a data-flickr-embed="true"  href="https://www.flickr.com/photos/148922320@N05/albums/72157680842147822" title="imagecube"><img src="https://c1.staticflickr.com/5/4182/34500371176_d564fcaae1_z.jpg" width="640" height="555" alt="imagecube"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script>
       </p>
@@ -45,16 +44,17 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
     templ(content, BGCOL_normal)
   }
   post("/upload") {
+    val startUrl = s"$ctx$startUrlStr"
     fileParams.get("file") match {
       case Some(file) =>
         if (file.getSize == 0) {
           contentType = "text/html"
-          templ(contentError("Hey! You forgot to select a file", url("/start")), BGCOL_alarm)
+          templ(contentError("Hey! You forgot to select a file", startUrl), BGCOL_alarm)
         } else {
           try {
             val mime = file.contentType.getOrElse("application/octet-stream")
-            val transformed = transformImageWeb(file.getInputStream, mime, mime)
-            Ok.apply(transformed, Map.apply(
+            val transformed = transformImageWeb(file.getInputStream, mime, mime, limit)
+            Ok(transformed, Map.apply(
               "Content-Type" -> mime,
               "Content-Disposition" -> ("attachment; filename=\"" + file.name + "\"")
             ))
@@ -62,12 +62,13 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
             case e: Exception =>
               contentType = "text/html"
               e.printStackTrace()
-              templ(contentError(s"Error transforming file: ${e.getMessage}", url("/start")), BGCOL_alarm)
+              templ(contentError(s"Error transforming file: ${e.getMessage}", startUrl), BGCOL_alarm)
           }
         }
       case None =>
         contentType = "text/html"
-        templ(contentError("Hey! You forgot to select a file", url("/start")), BGCOL_alarm)
+        templ(contentError("Hey! You forgot to select a file", startUrl
+        ), BGCOL_alarm)
     }
   }
 

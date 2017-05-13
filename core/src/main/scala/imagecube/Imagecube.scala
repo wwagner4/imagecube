@@ -47,10 +47,13 @@ case object HANDED_Left extends HANDED
 
 object Imagecube {
 
-  def transformImageWeb(in: InputStream, inMime: String, outMime: String): Array[Byte] = {
+  def transformImageWeb(in: InputStream, inMime: String, outMime: String, maxSize: Int): Array[Byte] = {
     val bi = readImageFromStream(in, inMime)
+    if (bi.getWidth() * bi.getHeight() > maxSize * 1000) {
+      throw new IllegalStateException(s"Your image exceeded the maximum size of $maxSize k pixel")
+    }
     in.close()
-    val bo = transformImage(bi, HANDED_Right, cutLines = true)
+    val bo = transformImage(bi, HANDED_Right, cutLines = false)
     writeImageToByteArray(bo, outMime)
   }
 
