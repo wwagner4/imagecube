@@ -177,10 +177,14 @@ object Imagecube {
       println("write lines")
 
       g.setColor(Color.BLACK)
-
       drawBack()
-      if (cutLines) drawCutLines()
 
+      if (cutLines) {
+        g.setColor(new Color(237,237,237))
+        drawCutLines()
+      }
+
+      g.setColor(Color.BLACK)
       handed match {
         case HANDED_Right =>
           drawFlapVertRight(P(2 * l, 0))
