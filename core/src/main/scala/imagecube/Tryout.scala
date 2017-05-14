@@ -59,7 +59,7 @@ object Tryout extends App {
     val files = inDir.listFiles()
     val start = System.nanoTime()
     files.foreach { f =>
-      if (f.isFile) {
+      if (f.isFile && !f.getName.startsWith(".")) {
         writeImage(f, outDir, handed, cutLines)
       }
     }
