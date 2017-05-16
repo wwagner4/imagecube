@@ -71,7 +71,8 @@ object Imagecube {
   }
 
   def transformImage(bi: BufferedImage, handed: HANDED, cutLines: Boolean): BufferedImage = {
-    val border = 30
+    val borderWidth = 30 // %
+    val auxLineWidth = 20 // %
 
     val w = bi.getWidth()
     val h = bi.getHeight()
@@ -81,9 +82,9 @@ object Imagecube {
     val partLen = p.partLen
     println(s"reading image $w $h partlen:$partLen")
 
-    val size = imageSize(partLen, percent(partLen, border))
+    val size = imageSize(partLen, percent(partLen, borderWidth))
     val bo = new BufferedImage(size.w, size.h, BufferedImage.TYPE_INT_RGB)
-    val pos: PartsPositions = partPositions(partLen, percent(partLen, border))
+    val pos: PartsPositions = partPositions(partLen, percent(partLen, borderWidth))
 
     def readImage(bimg: BufferedImage, x: Range, y: Range): Seq[Seq[Int]] = {
 
@@ -115,12 +116,19 @@ object Imagecube {
       handed match {
         case HANDED_Right =>
           val auxLine = imgPart.map(l => l(0)).zipWithIndex
-          (0 until percent(partLen, 7)).foreach { j =>
+          (0 until percent(partLen, auxLineWidth)).foreach { j =>
             auxLine.foreach {
               case (col, i) => bimg.setRGB(posi.x - j, posi.y + i, col)
             }
           }
-        case HANDED_Left => // NOT YET IMPLEMENTED
+        case HANDED_Left =>
+          val li = imgPart(0).size - 1
+          val auxLine = imgPart.map(l => l(li)).zipWithIndex
+          (0 until percent(partLen, auxLineWidth)).foreach { j =>
+            auxLine.foreach {
+              case (col, i) => bimg.setRGB(posi.x + partLen + j, posi.y + i, col)
+            }
+          }
       }
     }
 
@@ -129,7 +137,7 @@ object Imagecube {
         case HANDED_Right =>
           val li = imgPart(0).size - 1
           val auxLine = imgPart.map(l => l(li)).zipWithIndex
-          (0 until percent(partLen, 7)).foreach { j =>
+          (0 until percent(partLen, auxLineWidth)).foreach { j =>
             auxLine.foreach {
               case (col, i) => bimg.setRGB(posi.x + partLen + j, posi.y + i, col)
             }
@@ -142,7 +150,7 @@ object Imagecube {
       handed match {
         case HANDED_Right =>
           val auxLine = imgPart.map(l => l(0)).zipWithIndex
-          (0 until percent(partLen, 7)).foreach { j =>
+          (0 until percent(partLen, auxLineWidth)).foreach { j =>
             auxLine.foreach {
               case (col, i) => bimg.setRGB(posi.x + i, posi.y - j, col)
             }
@@ -156,7 +164,7 @@ object Imagecube {
         case HANDED_Right =>
           val li = imgPart(0).size - 1
           val auxLine = imgPart.map(l => l(li)).zipWithIndex
-          (0 until percent(partLen, 7)).foreach { j =>
+          (0 until percent(partLen, auxLineWidth)).foreach { j =>
             auxLine.foreach {
               case (col, i) => bimg.setRGB(posi.x + i, posi.y + partLen + j, col)
             }
@@ -330,7 +338,7 @@ object Imagecube {
 
     processParSeq()
 
-    writeLines(g, partLen, percent(partLen, border), percent(partLen, 15))
+    writeLines(g, partLen, percent(partLen, borderWidth), percent(partLen, 15))
 
     bo
   }
