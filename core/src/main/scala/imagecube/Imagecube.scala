@@ -72,7 +72,7 @@ object Imagecube {
 
   def transformImage(bi: BufferedImage, handed: HANDED, cutLines: Boolean): BufferedImage = {
     val borderWidth = 30 // %
-    val auxLineWidth = 20 // %
+    val auxLineWidth = 5 // %
 
     val w = bi.getWidth()
     val h = bi.getHeight()
@@ -182,7 +182,13 @@ object Imagecube {
               case (col, i) => bimg.setRGB(posi.x + i, posi.y + partLen + j, col)
             }
           }
-        case HANDED_Left => // NOT YET IMPLEMENTED
+        case HANDED_Left =>
+          val auxLine = imgPart.map(l => l(0)).zipWithIndex
+          (0 until percent(partLen, auxLineWidth)).foreach { j =>
+            auxLine.foreach {
+              case (col, i) => bimg.setRGB(posi.x + i, posi.y - j, col)
+            }
+          }
       }
     }
 

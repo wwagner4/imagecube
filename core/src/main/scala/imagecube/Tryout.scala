@@ -47,7 +47,7 @@ object Tryout extends App {
 
     val inDirPath = "tmp/cubes/in"
     val outDirPath = "tmp/cubes/out"
-    val handed = HANDED_Left
+    val handed = HANDED_Right
     val cutLines = true
 
     val homeDirStr = System.getProperty("user.home")
