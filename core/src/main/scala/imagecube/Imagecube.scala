@@ -112,11 +112,15 @@ object Imagecube {
     }
 
     def writeAuxLineBottom(imgPart: Seq[Seq[Int]], bimg: BufferedImage, posi: Pos): Unit = {
-      val auxLine = imgPart.map(l => l(0)).zipWithIndex
-      (0 until percent(partLen, 7)).foreach { j =>
-        auxLine.foreach {
-          case (col, i) => bimg.setRGB(posi.x - j, posi.y + i, col)
-        }
+      handed match {
+        case HANDED_Right =>
+          val auxLine = imgPart.map(l => l(0)).zipWithIndex
+          (0 until percent(partLen, 7)).foreach { j =>
+            auxLine.foreach {
+              case (col, i) => bimg.setRGB(posi.x - j, posi.y + i, col)
+            }
+          }
+        case HANDED_Left => // NOT YET IMPLEMENTED
       }
     }
 
