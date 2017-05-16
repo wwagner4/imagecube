@@ -125,7 +125,7 @@ object Imagecube {
       val auxLine = imgPart.map(l => l(li)).zipWithIndex
       (0 until percent(partLen, 7)).foreach { j =>
         auxLine.foreach {
-          case (col, i) => bimg.setRGB(posi.x + j, posi.y + i, col)
+          case (col, i) => bimg.setRGB(posi.x + partLen + j, posi.y + i, col)
         }
       }
     }
@@ -158,7 +158,7 @@ object Imagecube {
         }
       }
       partpos match {
-        case PARTPOS_Top => writeAuxLineTop(imgPart, bimg, posi.add(Pos(partLen, 0)))
+        case PARTPOS_Top => writeAuxLineTop(imgPart, bimg, posi)
         case PARTPOS_Bottom => writeAuxLineBottom(imgPart, bimg, posi)
         case _ => // Nothing to do
       }
