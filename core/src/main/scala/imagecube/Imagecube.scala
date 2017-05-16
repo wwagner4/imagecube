@@ -71,8 +71,9 @@ object Imagecube {
   }
 
   def transformImage(bi: BufferedImage, handed: HANDED, cutLines: Boolean): BufferedImage = {
-    val borderWidth = 30 // %
+    val borderWidth = 50 // %
     val auxLineWidth = 5 // %
+    val flapsWidth = 15 // %
 
     val w = bi.getWidth()
     val h = bi.getHeight()
@@ -357,7 +358,7 @@ object Imagecube {
 
     processParSeq()
 
-    writeLines(g, partLen, percent(partLen, borderWidth), percent(partLen, 15))
+    writeLines(g, partLen, percent(partLen, borderWidth), percent(partLen, flapsWidth))
 
     bo
   }
