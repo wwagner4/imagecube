@@ -125,31 +125,43 @@ object Imagecube {
     }
 
     def writeAuxLineTop(imgPart: Seq[Seq[Int]], bimg: BufferedImage, posi: Pos): Unit = {
-      val li = imgPart(0).size - 1
-      val auxLine = imgPart.map(l => l(li)).zipWithIndex
-      (0 until percent(partLen, 7)).foreach { j =>
-        auxLine.foreach {
-          case (col, i) => bimg.setRGB(posi.x + partLen + j, posi.y + i, col)
-        }
+      handed match {
+        case HANDED_Right =>
+          val li = imgPart(0).size - 1
+          val auxLine = imgPart.map(l => l(li)).zipWithIndex
+          (0 until percent(partLen, 7)).foreach { j =>
+            auxLine.foreach {
+              case (col, i) => bimg.setRGB(posi.x + partLen + j, posi.y + i, col)
+            }
+          }
+        case HANDED_Left => // NOT YET IMPLEMENTED
       }
     }
 
     def writeAuxLineLeft(imgPart: Seq[Seq[Int]], bimg: BufferedImage, posi: Pos): Unit = {
-      val auxLine = imgPart.map(l => l(0)).zipWithIndex
-      (0 until percent(partLen, 7)).foreach { j =>
-        auxLine.foreach {
-          case (col, i) => bimg.setRGB(posi.x + i, posi.y - j, col)
-        }
+      handed match {
+        case HANDED_Right =>
+          val auxLine = imgPart.map(l => l(0)).zipWithIndex
+          (0 until percent(partLen, 7)).foreach { j =>
+            auxLine.foreach {
+              case (col, i) => bimg.setRGB(posi.x + i, posi.y - j, col)
+            }
+          }
+        case HANDED_Left => // NOT YET IMPLEMENTED
       }
     }
 
     def writeAuxLineRight(imgPart: Seq[Seq[Int]], bimg: BufferedImage, posi: Pos): Unit = {
-      val li = imgPart(0).size - 1
-      val auxLine = imgPart.map(l => l(li)).zipWithIndex
-      (0 until percent(partLen, 7)).foreach { j =>
-        auxLine.foreach {
-          case (col, i) => bimg.setRGB(posi.x + i, posi.y + partLen + j, col)
-        }
+      handed match {
+        case HANDED_Right =>
+          val li = imgPart(0).size - 1
+          val auxLine = imgPart.map(l => l(li)).zipWithIndex
+          (0 until percent(partLen, 7)).foreach { j =>
+            auxLine.foreach {
+              case (col, i) => bimg.setRGB(posi.x + i, posi.y + partLen + j, col)
+            }
+          }
+        case HANDED_Left => // NOT YET IMPLEMENTED
       }
     }
 
