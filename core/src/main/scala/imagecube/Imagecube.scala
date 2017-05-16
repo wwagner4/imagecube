@@ -111,7 +111,7 @@ object Imagecube {
       }
     }
 
-    def writeAuxLineHead(imgPart: Seq[Seq[Int]], bimg: BufferedImage, posi: Pos): Unit = {
+    def writeAuxLineBottom(imgPart: Seq[Seq[Int]], bimg: BufferedImage, posi: Pos): Unit = {
       val auxLine = imgPart.map(l => l(0)).zipWithIndex
       (0 until percent(partLen, 7)).foreach { j =>
         auxLine.foreach {
@@ -120,7 +120,7 @@ object Imagecube {
       }
     }
 
-    def writeAuxLineTail(imgPart: Seq[Seq[Int]], bimg: BufferedImage, posi: Pos): Unit = {
+    def writeAuxLineTop(imgPart: Seq[Seq[Int]], bimg: BufferedImage, posi: Pos): Unit = {
       val li = imgPart(0).size - 1
       val auxLine = imgPart.map(l => l(li)).zipWithIndex
       (0 until percent(partLen, 7)).foreach { j =>
@@ -130,7 +130,7 @@ object Imagecube {
       }
     }
 
-    def writeAuxLineHeadTransp(imgPart: Seq[Seq[Int]], bimg: BufferedImage, posi: Pos): Unit = {
+    def writeAuxLineLeft(imgPart: Seq[Seq[Int]], bimg: BufferedImage, posi: Pos): Unit = {
       val auxLine = imgPart.map(l => l(0)).zipWithIndex
       (0 until percent(partLen, 7)).foreach { j =>
         auxLine.foreach {
@@ -139,7 +139,7 @@ object Imagecube {
       }
     }
 
-    def writeAuxLineTailTransp(imgPart: Seq[Seq[Int]], bimg: BufferedImage, posi: Pos): Unit = {
+    def writeAuxLineRight(imgPart: Seq[Seq[Int]], bimg: BufferedImage, posi: Pos): Unit = {
       val li = imgPart(0).size - 1
       val auxLine = imgPart.map(l => l(li)).zipWithIndex
       (0 until percent(partLen, 7)).foreach { j =>
@@ -158,8 +158,8 @@ object Imagecube {
         }
       }
       partpos match {
-        case PARTPOS_Top => writeAuxLineTail(imgPart, bimg, posi.add(Pos(partLen, 0)))
-        case PARTPOS_Bottom => writeAuxLineHead(imgPart, bimg, posi)
+        case PARTPOS_Top => writeAuxLineTop(imgPart, bimg, posi.add(Pos(partLen, 0)))
+        case PARTPOS_Bottom => writeAuxLineBottom(imgPart, bimg, posi)
         case _ => // Nothing to do
       }
 
@@ -174,8 +174,8 @@ object Imagecube {
         }
       }
       partpos match {
-        case PARTPOS_Right => writeAuxLineTailTransp(imgPart, bimg, posi.add(Pos(0, partLen)))
-        case PARTPOS_Left => writeAuxLineHeadTransp(imgPart, bimg, posi)
+        case PARTPOS_Right => writeAuxLineRight(imgPart, bimg, posi.add(Pos(0, partLen)))
+        case PARTPOS_Left => writeAuxLineLeft(imgPart, bimg, posi)
         case _ => // Nothing to do
       }
       println(s" << writeImagePart transp $partpos")
