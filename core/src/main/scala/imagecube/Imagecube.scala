@@ -21,10 +21,9 @@ case class CutParams(
                       y3: Range
                     )
 
-case class Pos(
-                x: Int,
-                y: Int
-              )
+case class Pos(x: Int, y: Int) {
+  def add(other: Pos): Pos = Pos(x + other.x, y + other.y)
+}
 
 case class PartsPositions(
                            center: Pos,
@@ -45,6 +44,20 @@ case object HANDED_Right extends HANDED
 
 case object HANDED_Left extends HANDED
 
+
+sealed trait PARTPOS
+
+case object PARTPOS_Center extends PARTPOS
+
+case object PARTPOS_Top extends PARTPOS
+
+case object PARTPOS_Bottom extends PARTPOS
+
+case object PARTPOS_Left extends PARTPOS
+
+case object PARTPOS_Right extends PARTPOS
+
+
 object Imagecube {
 
   def transformImageWeb(in: InputStream, inMime: String, outMime: String, maxSize: Int): Array[Byte] = {
@@ -62,11 +75,11 @@ object Imagecube {
 
     val w = bi.getWidth()
     val h = bi.getHeight()
-    println(s"reading image $w $h")
     val p: CutParams = cutParams(w, h)
     val (xrLeft, yrLeft) = transposeParamsLeft(p)
     val (xrRight, yrRight) = transposeParamsRight(p)
     val partLen = p.partLen
+    println(s"reading image $w $h partlen:$partLen")
 
     val size = imageSize(partLen, percent(partLen, border))
     val bo = new BufferedImage(size.w, size.h, BufferedImage.TYPE_INT_RGB)
@@ -98,24 +111,90 @@ object Imagecube {
       }
     }
 
-    def writeImagePart(partId: String, bimg: BufferedImage, imgPart: Seq[Seq[Int]], pos: Pos): Unit = {
-      println(s" >> writeImagePart $partId")
-      imgPart.zipWithIndex.foreach {
-        case (row, i) => row.zipWithIndex.foreach {
-          case (col, j) => bimg.setRGB(pos.x + j, pos.y + i, col)
-        }
+    def writeAuxLineBottom(imgPart: Seq[Seq[Int]], bimg: BufferedImage, posi: Pos): Unit = {
+      handed match {
+        case HANDED_Right =>
+          val auxLine = imgPart.map(l => l(0)).zipWithIndex
+          (0 until percent(partLen, 7)).foreach { j =>
+            auxLine.foreach {
+              case (col, i) => bimg.setRGB(posi.x - j, posi.y + i, col)
+            }
+          }
+        case HANDED_Left => // NOT YET IMPLEMENTED
       }
-      println(s" << writeImagePart $partId")
     }
 
-    def writeImagePartTransp(partId: String, bimg: BufferedImage, imgPart: Seq[Seq[Int]], pos: Pos): Unit = {
-      println(s" >> writeImagePart transp $partId")
+    def writeAuxLineTop(imgPart: Seq[Seq[Int]], bimg: BufferedImage, posi: Pos): Unit = {
+      handed match {
+        case HANDED_Right =>
+          val li = imgPart(0).size - 1
+          val auxLine = imgPart.map(l => l(li)).zipWithIndex
+          (0 until percent(partLen, 7)).foreach { j =>
+            auxLine.foreach {
+              case (col, i) => bimg.setRGB(posi.x + partLen + j, posi.y + i, col)
+            }
+          }
+        case HANDED_Left => // NOT YET IMPLEMENTED
+      }
+    }
+
+    def writeAuxLineLeft(imgPart: Seq[Seq[Int]], bimg: BufferedImage, posi: Pos): Unit = {
+      handed match {
+        case HANDED_Right =>
+          val auxLine = imgPart.map(l => l(0)).zipWithIndex
+          (0 until percent(partLen, 7)).foreach { j =>
+            auxLine.foreach {
+              case (col, i) => bimg.setRGB(posi.x + i, posi.y - j, col)
+            }
+          }
+        case HANDED_Left => // NOT YET IMPLEMENTED
+      }
+    }
+
+    def writeAuxLineRight(imgPart: Seq[Seq[Int]], bimg: BufferedImage, posi: Pos): Unit = {
+      handed match {
+        case HANDED_Right =>
+          val li = imgPart(0).size - 1
+          val auxLine = imgPart.map(l => l(li)).zipWithIndex
+          (0 until percent(partLen, 7)).foreach { j =>
+            auxLine.foreach {
+              case (col, i) => bimg.setRGB(posi.x + i, posi.y + partLen + j, col)
+            }
+          }
+        case HANDED_Left => // NOT YET IMPLEMENTED
+      }
+    }
+
+    def writeImagePart(partpos: PARTPOS, bimg: BufferedImage, imgPart: Seq[Seq[Int]], posi: Pos): Unit = {
+      println(s" >> writeImagePart $partpos")
       imgPart.zipWithIndex.foreach {
         case (row, i) => row.zipWithIndex.foreach {
-          case (col, j) => bimg.setRGB(pos.x + i, pos.y + j, col)
+          case (col, j) =>
+            bimg.setRGB(posi.x + j, posi.y + i, col)
         }
       }
-      println(s" << writeImagePart transp $partId")
+      partpos match {
+        case PARTPOS_Top => writeAuxLineTop(imgPart, bimg, posi)
+        case PARTPOS_Bottom => writeAuxLineBottom(imgPart, bimg, posi)
+        case _ => // Nothing to do
+      }
+
+      println(s" << writeImagePart $partpos")
+    }
+
+    def writeImagePartTransp(partpos: PARTPOS, bimg: BufferedImage, imgPart: Seq[Seq[Int]], posi: Pos): Unit = {
+      println(s" >> writeImagePart transp $partpos")
+      imgPart.zipWithIndex.foreach {
+        case (row, i) => row.zipWithIndex.foreach {
+          case (col, j) => bimg.setRGB(posi.x + i, posi.y + j, col)
+        }
+      }
+      partpos match {
+        case PARTPOS_Right => writeAuxLineRight(imgPart, bimg, posi)
+        case PARTPOS_Left => writeAuxLineLeft(imgPart, bimg, posi)
+        case _ => // Nothing to do
+      }
+      println(s" << writeImagePart transp $partpos")
     }
 
     def writeLines(g: Graphics2D, l: Int, b: Int, d: Int): Unit = {
@@ -180,7 +259,7 @@ object Imagecube {
       drawBack()
 
       if (cutLines) {
-        g.setColor(new Color(237,237,237))
+        g.setColor(new Color(237, 237, 237))
         drawCutLines()
       }
 
@@ -207,31 +286,31 @@ object Imagecube {
 
     def processCenter(bo: BufferedImage, bimg: BufferedImage, rx: Range, ry: Range): Unit = {
       val img = readImage(bimg, rx, ry)
-      writeImagePart("C", bo, img, pos.center)
+      writeImagePart(PARTPOS_Center, bo, img, pos.center)
     }
 
     def processLeft(bo: BufferedImage, bimg: BufferedImage, rx: Range, ry: Range): Unit = {
       val img = readImageTransp(bimg, rx, ry)
-      val imgs = shortenImagePartSeq("L", img)
-      writeImagePartTransp("L", bo, imgs, pos.left)
+      val imgs = shortenImagePartSeq(PARTPOS_Left, img)
+      writeImagePartTransp(PARTPOS_Left, bo, imgs, pos.left)
     }
 
     def processRight(bo: BufferedImage, bimg: BufferedImage, rx: Range, ry: Range): Unit = {
       val img = readImageTransp(bimg, rx, ry)
-      val imgs = shortenImagePartSeq("R", img.reverse).reverse
-      writeImagePartTransp("R", bo, imgs, pos.right)
+      val imgs = shortenImagePartSeq(PARTPOS_Right, img.reverse).reverse
+      writeImagePartTransp(PARTPOS_Right, bo, imgs, pos.right)
     }
 
     def processTop(bo: BufferedImage, bimg: BufferedImage, rx: Range, ry: Range): Unit = {
       val img = readImage(bimg, rx, ry)
-      val imgs = shortenImagePartSeq("T", img)
-      writeImagePart("T", bo, imgs, pos.top)
+      val imgs = shortenImagePartSeq(PARTPOS_Top, img)
+      writeImagePart(PARTPOS_Top, bo, imgs, pos.top)
     }
 
     def processBottom(bo: BufferedImage, bimg: BufferedImage, rx: Range, ry: Range): Unit = {
       val img = readImage(bimg, rx, ry)
-      val imgs = shortenImagePartSeq("B", img.reverse).reverse
-      writeImagePart("B", bo, imgs, pos.bottom)
+      val imgs = shortenImagePartSeq(PARTPOS_Bottom, img.reverse).reverse
+      writeImagePart(PARTPOS_Bottom, bo, imgs, pos.bottom)
     }
 
     def processParSeq(): Unit = {
@@ -348,14 +427,14 @@ object Imagecube {
     else transpose(cutParams(height, width))
   }
 
-  def shortenImagePartSeq(partId: String, part: Seq[Seq[Int]]): Seq[Seq[Int]] = {
-    val newRowsA = shortenRowsA(partId, part)
-    val newRowsB = shortenRowsB(partId, part)
+  def shortenImagePartSeq(partpos: PARTPOS, part: Seq[Seq[Int]]): Seq[Seq[Int]] = {
+    val newRowsA = shortenRowsA(partpos, part)
+    val newRowsB = shortenRowsB(partpos, part)
     newRowsA.zip(newRowsB).map { case (a, b) => a ++ b }
   }
 
-  def shortenRowsA(partId: String, part: Seq[Seq[Int]]): Seq[Seq[Int]] = {
-    println(s" >> shorten $partId A")
+  def shortenRowsA(partpos: PARTPOS, part: Seq[Seq[Int]]): Seq[Seq[Int]] = {
+    println(s" >> shorten $partpos A")
     val re = part.zipWithIndex.map { case (row, i) =>
       val n = part.size
       val (from, to) = shortenA(i, n)
@@ -364,12 +443,12 @@ object Imagecube {
         .map { case (c, _) => c }
       linearCompress(filteredCol, n / 2, colorMix)
     }
-    println(s" << shorten $partId A")
+    println(s" << shorten $partpos A")
     re
   }
 
-  def shortenRowsB(partId: String, part: Seq[Seq[Int]]): Seq[Seq[Int]] = {
-    println(s" >> shorten $partId B")
+  def shortenRowsB(partpos: PARTPOS, part: Seq[Seq[Int]]): Seq[Seq[Int]] = {
+    println(s" >> shorten $partpos B")
     val re = part.zipWithIndex.map { case (row, i) =>
       val n = part.size
       val (from, to) = shortenB(i, n)
@@ -379,7 +458,7 @@ object Imagecube {
       val m = if (n % 2 == 0) n / 2 else n / 2 + 1
       linearCompress(filteredCol, m, colorMix)
     }
-    println(s" << shorten $partId B")
+    println(s" << shorten $partpos B")
     re
   }
 
