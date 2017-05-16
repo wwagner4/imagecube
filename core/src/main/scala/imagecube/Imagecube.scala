@@ -161,7 +161,14 @@ object Imagecube {
               case (col, i) => bimg.setRGB(posi.x + i, posi.y - j, col)
             }
           }
-        case HANDED_Left => // NOT YET IMPLEMENTED
+        case HANDED_Left =>
+          val li = imgPart(0).size - 1
+          val auxLine = imgPart.map(l => l(li)).zipWithIndex
+          (0 until percent(partLen, auxLineWidth)).foreach { j =>
+            auxLine.foreach {
+              case (col, i) => bimg.setRGB(posi.x + i, posi.y + partLen + j, col)
+            }
+          }
       }
     }
 
