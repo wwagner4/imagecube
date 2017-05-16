@@ -140,10 +140,11 @@ object Imagecube {
     }
 
     def writeAuxLineTailTransp(imgPart: Seq[Seq[Int]], bimg: BufferedImage, posi: Pos): Unit = {
-      val auxLine = imgPart.map(l => l(0)).zipWithIndex
+      val li = imgPart(0).size - 1
+      val auxLine = imgPart.map(l => l(li)).zipWithIndex
       (0 until percent(partLen, 7)).foreach { j =>
         auxLine.foreach {
-          case (col, i) => bimg.setRGB(posi.x + j, posi.y + i, col)
+          case (col, i) => bimg.setRGB(posi.x + i, posi.y + j, col)
         }
       }
     }
@@ -173,7 +174,7 @@ object Imagecube {
         }
       }
       partpos match {
-        //case PARTPOS_Right => writeAuxLineTailTransp(imgPart, bimg, posi)
+        case PARTPOS_Right => writeAuxLineTailTransp(imgPart, bimg, posi.add(Pos(0, partLen)))
         case PARTPOS_Left => writeAuxLineHeadTransp(imgPart, bimg, posi)
         case _ => // Nothing to do
       }
