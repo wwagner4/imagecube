@@ -2,74 +2,11 @@ package imagecube
 
 import java.awt.Color
 import java.io._
-import javax.imageio._
-
 import imagecube.Imagecube._
 
+object Tryout {
 
-object Tryout extends App {
-
-  // readFile()
-  // createCutParams()
-  // transform()
-  // runFibs()
-  // diffs()
-  // compress()
-  // mean()
-  // rgb()
-  // shorten()
-  // shorten1()
-  // positionParts()
-  // parallel()
-  // percent()
-  // runExtractName()
-  // runTestImages()
-  // readWriteStream()
-  runDir()
-
-  def runDir(): Unit = {
-
-    def writeImage(f: File, outDir: File, handed: HANDED, cutLines: Boolean): Unit = {
-      try {
-        val biIn = ImageIO.read(f)
-        if (biIn == null) throw new IllegalStateException(s"$f seems not to contain image data")
-        val biOut = transformImage(biIn, handed, cutLines)
-        val fOutName = s"${extractName(f)}_out.png"
-        val outFile = new File(outDir, fOutName)
-        val typ = imageType(outFile)
-        ImageIO.write(biOut, typ, outFile)
-        println(s"wrote image to $outFile type: $typ")
-      } catch {
-        case e: Exception =>
-          println(s"ERROR: Could not convert image ${f.getName} because $e")
-      }
-    }
-
-    val inDirPath = "tmp/cubes/in"
-    val outDirPath = "tmp/cubes/out"
-    val handed = HANDED_Right
-    val cutLines = true
-
-    val homeDirStr = System.getProperty("user.home")
-    val homeDir = new File(homeDirStr)
-    val inDir = new File(homeDir, inDirPath)
-    if (!inDir.exists()) throw new IllegalStateException(s"Input directory '$inDir' does not exist")
-    val outDir = new File(homeDir, outDirPath)
-    outDir.mkdirs()
-    val files = inDir.listFiles()
-    val start = System.nanoTime()
-    files.foreach { f =>
-      if (f.isFile && !f.getName.startsWith(".")) {
-        writeImage(f, outDir, handed, cutLines)
-      }
-    }
-    val stop = System.nanoTime()
-    val time = (stop - start).toDouble / 1000000000L
-    println(f"FINISHED runDir $time%.2f s")
-
-  }
-
-    def runExtractName(): Unit = {
+  def runExtractName(): Unit = {
     Seq(
       new File("a/b/c.png"),
       new File("a/b/c"),
