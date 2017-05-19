@@ -6,34 +6,41 @@ import javax.imageio.ImageIO
 import imagecube.Imagecube._
 
 
+case class Params(inDirPath: String = "tmp/cubes/in",
+                  outDirPath: String = "tmp/cubes/out",
+                  handed: HANDED = HANDED_Right,
+                  cutLines: Boolean = false
+                 )
+
 object Main extends App {
 
   runDir()
 
   def runDir(): Unit = {
 
-    val inDirPath = "tmp/cubes/in"
-    val outDirPath = "tmp/cubes/out"
-    val handed = HANDED_Right
-    val cutLines = false
+    val params = readCommandline()
 
     val homeDirStr = System.getProperty("user.home")
     val homeDir = new File(homeDirStr)
-    val inDir = new File(homeDir, inDirPath)
+    val inDir = new File(homeDir, params.inDirPath)
     if (!inDir.exists()) throw new IllegalStateException(s"Input directory '$inDir' does not exist")
-    val outDir = new File(homeDir, outDirPath)
+    val outDir = new File(homeDir, params.outDirPath)
     outDir.mkdirs()
     val files = inDir.listFiles()
     val start = System.nanoTime()
     files.foreach { f =>
       if (f.isFile && !f.getName.startsWith(".")) {
-        writeImage(f, outDir, handed, cutLines)
+        writeImage(f, outDir, params.handed, params.cutLines)
       }
     }
     val stop = System.nanoTime()
     val time = (stop - start).toDouble / 1000000000L
     println(f"FINISHED runDir $time%.2f s")
 
+  }
+
+  def readCommandline(): Params = {
+    Params()
   }
 
   def writeImage(f: File, outDir: File, handed: HANDED, cutLines: Boolean): Unit = {
