@@ -1,6 +1,4 @@
 import org.scalatra.sbt._
-import org.scalatra.sbt.PluginKeys._
-import ScalateKeys._
 
 val ScalatraVersion = "2.5.0"
 
@@ -41,7 +39,8 @@ lazy val web = project.in(file("web"))
     libraryDependencies += "org.scalatra" %% "scalatra-specs2" % ScalatraVersion % "test",
     libraryDependencies += "org.eclipse.jetty" % "jetty-webapp" % "9.4.5.v20170502",
     libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided",
-    libraryDependencies += "org.slf4j" % "slf4j-simple" % "1.7.24"
+    libraryDependencies += "org.slf4j" % "slf4j-simple" % "1.7.24",
+      libraryDependencies += "com.github.scopt" %% "scopt" % "3.5.0"
   )
     
     
