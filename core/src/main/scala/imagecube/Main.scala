@@ -12,13 +12,13 @@ case class Params(inDirPath: String = "tmp/cubes/in",
                   cutLines: Boolean = false
                  )
 
-object Main extends App {
+object Main {
 
-  runDir()
+  def main( args:Array[String] ):Unit = runDir(args)
 
-  def runDir(): Unit = {
+  def runDir(args: Array[String]): Unit = {
 
-    val params = readCommandline()
+    val params = readCommandline(args)
 
     val homeDirStr = System.getProperty("user.home")
     val homeDir = new File(homeDirStr)
@@ -39,7 +39,9 @@ object Main extends App {
 
   }
 
-  def readCommandline(): Params = {
+  def readCommandline(args: Array[String]): Params = {
+    val paramsStr = args.mkString("<", "|", ">")
+    println("Commandline: " + paramsStr)
     Params()
   }
 
