@@ -42,7 +42,7 @@ object Main {
         c.copy(outDir = x)).text("Output directory. Default is $HOME/imagecube/out.")
 
       opt[String]('h', "handed").action((x, c) =>
-        c.copy(handed = strToHanded(x))).text("Defines if the lashes ar right or left handed. Values 'r' or 'l'. Default is 'r'.")
+        c.copy(handed = strToHanded(x))).text("Defines if the lashes are right or left handed. Values 'r' or 'l'. Default is 'r'.")
 
       opt[Unit]('c', "cutLines").action((_, c) =>
         c.copy(cutLines = true)).text("Draw extra lines for cutting. Default is no extra lines. Set this option if your image(s) are very light.")
