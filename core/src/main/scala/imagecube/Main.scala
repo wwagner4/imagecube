@@ -32,6 +32,16 @@ object Main {
 
       opt[String]('i', "inDirPath").action((x, c) =>
         c.copy(inDirPath = x)).text("path to the input directory")
+
+      opt[String]('o', "outDirPath").action((x, c) =>
+        c.copy(outDirPath = x)).text("path to the output directory")
+
+      opt[String]('h', "handed").action((x, c) =>
+        c.copy(handed = strToHanded(x))).text("path to the input directory")
+
+      opt[Unit]('c', "cutLines").action((_, c) =>
+        c.copy(cutLines = true)).text("draw extra lines for cutting")
+
     }
 
     parser.parse(args, Config()) match {
@@ -57,6 +67,15 @@ object Main {
 
     Config()
   }
+
+  def strToHanded(str: String): HANDED = {
+    str match {
+      case "r" => HANDED_Right
+      case "l" => HANDED_Left
+      case _ => throw new IllegalArgumentException(s"Invalid value '$str' for option handed (-h). Valid is 'r' for right or 'l for left'")
+    }
+  }
+
 
   def writeImage(f: File, outDir: File, handed: HANDED, cutLines: Boolean): Unit = {
     try {
