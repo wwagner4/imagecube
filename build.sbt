@@ -20,6 +20,7 @@ lazy val core = project.in(file("core"))
   .settings(
     commonSettings,
     name := "imagecube-core",
+    assemblyJarName in assembly := "imagecube.jar",
     libraryDependencies += "com.github.scopt" %% "scopt" % "3.5.0"
   )
 

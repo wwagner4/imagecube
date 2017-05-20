@@ -30,14 +30,14 @@ object Main {
     val parser = new scopt.OptionParser[Config]("java -jar imagecube.jar") {
       head("imagecube", "1.0")
 
-      opt[String]('i', "inDirPath").action((x, c) =>
+      opt[String]('i', "inDir").action((x, c) =>
         c.copy(inDirPath = x)).text("path to the input directory")
 
-      opt[String]('o', "outDirPath").action((x, c) =>
+      opt[String]('o', "outDir").action((x, c) =>
         c.copy(outDirPath = x)).text("path to the output directory")
 
       opt[String]('h', "handed").action((x, c) =>
-        c.copy(handed = strToHanded(x))).text("path to the input directory")
+        c.copy(handed = strToHanded(x))).text("defines weather the lashes ar right or left handed. Values 'r' or 'l'")
 
       opt[Unit]('c', "cutLines").action((_, c) =>
         c.copy(cutLines = true)).text("draw extra lines for cutting")
