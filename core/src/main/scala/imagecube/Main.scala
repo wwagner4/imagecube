@@ -6,7 +6,7 @@ import javax.imageio.ImageIO
 import imagecube.Imagecube._
 
 
-case class Params(inDirPath: String = "tmp/cubes/in",
+case class Config(inDirPath: String = "tmp/cubes/in",
                   outDirPath: String = "tmp/cubes/out",
                   handed: HANDED = HANDED_Right,
                   cutLines: Boolean = false
@@ -14,35 +14,48 @@ case class Params(inDirPath: String = "tmp/cubes/in",
 
 object Main {
 
-  def main( args:Array[String] ):Unit = runDir(args)
+  def main(args: Array[String]): Unit = runDir(args)
 
   def runDir(args: Array[String]): Unit = {
 
-    val params = readCommandline(args)
+    readCommandline(args)
 
-    val homeDirStr = System.getProperty("user.home")
-    val homeDir = new File(homeDirStr)
-    val inDir = new File(homeDir, params.inDirPath)
-    if (!inDir.exists()) throw new IllegalStateException(s"Input directory '$inDir' does not exist")
-    val outDir = new File(homeDir, params.outDirPath)
-    outDir.mkdirs()
-    val files = inDir.listFiles()
-    val start = System.nanoTime()
-    files.foreach { f =>
-      if (f.isFile && !f.getName.startsWith(".")) {
-        writeImage(f, outDir, params.handed, params.cutLines)
-      }
-    }
-    val stop = System.nanoTime()
-    val time = (stop - start).toDouble / 1000000000L
-    println(f"FINISHED runDir $time%.2f s")
 
   }
 
-  def readCommandline(args: Array[String]): Params = {
+  def readCommandline(args: Array[String]): Unit = {
     val paramsStr = args.mkString("<", "|", ">")
     println("Commandline: " + paramsStr)
-    Params()
+
+    val parser = new scopt.OptionParser[Config]("java -jar imagecube.jar") {
+      head("imagecube", "1.0")
+
+      opt[String]('i', "inDirPath").action((x, c) =>
+        c.copy(inDirPath = x)).text("path to the input directory")
+    }
+
+    parser.parse(args, Config()) match {
+      case Some(config) =>
+        val homeDirStr = System.getProperty("user.home")
+        val homeDir = new File(homeDirStr)
+        val inDir = new File(homeDir, config.inDirPath)
+        if (!inDir.exists()) throw new IllegalStateException(s"Input directory '$inDir' does not exist")
+        val outDir = new File(homeDir, config.outDirPath)
+        outDir.mkdirs()
+        val files = inDir.listFiles()
+        val start = System.nanoTime()
+        files.foreach { f =>
+          if (f.isFile && !f.getName.startsWith(".")) {
+            writeImage(f, outDir, config.handed, config.cutLines)
+          }
+        }
+        val stop = System.nanoTime()
+        val time = (stop - start).toDouble / 1000000000L
+        println(f"FINISHED runDir $time%.2f s")
+      case None => // Nothing to do
+    }
+
+    Config()
   }
 
   def writeImage(f: File, outDir: File, handed: HANDED, cutLines: Boolean): Unit = {
