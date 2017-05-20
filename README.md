@@ -6,7 +6,7 @@ Application to project images on cubes.
 
 If you want to create your own imagecubes downlodad the following jar
 
-[imagecube.jar](#)
+[imagecube.jar](https://github.com/wwagner4/imagecube/blob/master/bin/imagecube.jar)
 
 and start it using the following call
 
