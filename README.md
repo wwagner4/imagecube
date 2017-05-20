@@ -10,7 +10,7 @@ If you want to create your own imagecubes go to this page
 
 or (if you want to process larger images) downlodad the following jar
 
-[imagecube.jar](https://github.com/wwagner4/imagecube/blob/master/bin/imagecube.jar)
+[imagecube.jar](https://github.com/wwagner4/imagecube/blob/master/bin/imagecube.jar?raw=true)
 
 and start it using the following call
 
