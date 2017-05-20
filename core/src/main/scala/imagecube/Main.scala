@@ -6,11 +6,18 @@ import javax.imageio.ImageIO
 import imagecube.Imagecube._
 
 
-case class Config(inDirPath: String = "tmp/cubes/in",
-                  outDirPath: String = "tmp/cubes/out",
+object Config {
+  def homeDir = new File(System.getProperty("user.home"))
+
+  def workDir = new File(homeDir, "imagecube")
+}
+
+case class Config(inDir: File = new File(Config.workDir, "in"),
+                  outDir: File = new File(Config.workDir, "out"),
                   handed: HANDED = HANDED_Right,
                   cutLines: Boolean = false
                  )
+
 
 object Main {
 
@@ -24,44 +31,26 @@ object Main {
   }
 
   def readCommandline(args: Array[String]): Unit = {
-    val paramsStr = args.mkString("<", "|", ">")
-    println("Commandline: " + paramsStr)
 
     val parser = new scopt.OptionParser[Config]("java -jar imagecube.jar") {
       head("imagecube", "1.0")
 
-      opt[String]('i', "inDir").action((x, c) =>
-        c.copy(inDirPath = x)).text("path to the input directory")
+      opt[File]('i', "inDir").action((x, c) =>
+        c.copy(inDir = x)).text("Input directory. Default is $HOME/imagecube/in.")
 
-      opt[String]('o', "outDir").action((x, c) =>
-        c.copy(outDirPath = x)).text("path to the output directory")
+      opt[File]('o', "outDir").action((x, c) =>
+        c.copy(outDir = x)).text("Output directory. Default is $HOME/imagecube/out.")
 
       opt[String]('h', "handed").action((x, c) =>
-        c.copy(handed = strToHanded(x))).text("defines weather the lashes ar right or left handed. Values 'r' or 'l'")
+        c.copy(handed = strToHanded(x))).text("Defines if the lashes ar right or left handed. Values 'r' or 'l'. Default is 'r'.")
 
       opt[Unit]('c', "cutLines").action((_, c) =>
-        c.copy(cutLines = true)).text("draw extra lines for cutting")
+        c.copy(cutLines = true)).text("Draw extra lines for cutting. Default is no extra lines. Set this option if your image(s) are very light.")
 
     }
 
     parser.parse(args, Config()) match {
-      case Some(config) =>
-        val homeDirStr = System.getProperty("user.home")
-        val homeDir = new File(homeDirStr)
-        val inDir = new File(homeDir, config.inDirPath)
-        if (!inDir.exists()) throw new IllegalStateException(s"Input directory '$inDir' does not exist")
-        val outDir = new File(homeDir, config.outDirPath)
-        outDir.mkdirs()
-        val files = inDir.listFiles()
-        val start = System.nanoTime()
-        files.foreach { f =>
-          if (f.isFile && !f.getName.startsWith(".")) {
-            writeImage(f, outDir, config.handed, config.cutLines)
-          }
-        }
-        val stop = System.nanoTime()
-        val time = (stop - start).toDouble / 1000000000L
-        println(f"FINISHED runDir $time%.2f s")
+      case Some(config) => writeImage(config)
       case None => // Nothing to do
     }
 
@@ -73,6 +62,24 @@ object Main {
       case "r" => HANDED_Right
       case "l" => HANDED_Left
       case _ => throw new IllegalArgumentException(s"Invalid value '$str' for option handed (-h). Valid is 'r' for right or 'l for left'")
+    }
+  }
+
+  def writeImage(conf: Config): Unit = {
+    try {
+      println(f"START processing images in ${conf.inDir}")
+      if (!conf.inDir.exists()) throw new IllegalStateException(s"Input directory '${conf.inDir}' does not exist")
+      conf.outDir.mkdirs()
+      val files = conf.inDir.listFiles()
+      files.foreach { f =>
+        if (f.isFile && !f.getName.startsWith(".")) {
+          writeImage(f, conf.outDir, conf.handed, conf.cutLines)
+        }
+      }
+      println(f"FINISHED processing images in ${conf.inDir}")
+    } catch {
+      case e: Exception =>
+        println(s"ERROR: Could not create imagecubes because: ${e.getMessage}")
     }
   }
 
@@ -89,7 +96,7 @@ object Main {
       println(s"wrote image to $outFile type: $typ")
     } catch {
       case e: Exception =>
-        println(s"ERROR: Could not convert image ${f.getName} because $e")
+        println(s"ERROR: Could not convert image ${f.getName} because: ${e.getMessage}")
     }
   }
 
