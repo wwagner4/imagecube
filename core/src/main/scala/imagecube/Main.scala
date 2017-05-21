@@ -47,6 +47,8 @@ object Main {
       opt[Unit]('c', "cutLines").action((_, c) =>
         c.copy(cutLines = true)).text("Draw extra lines for cutting. Default is no extra lines. Set this option if your image(s) are very light.")
 
+      help("help").text("Prints this usage text.sbt")
+
     }
 
     parser.parse(args, Config()) match {

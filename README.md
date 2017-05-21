@@ -25,6 +25,7 @@ You may use the following options:
   -o, --outDir <value>  Output directory. Default is $HOME/imagecube/out.
   -h, --handed <value>  Defines if the lashes are right or left handed. Values 'r' or 'l'. Default is 'r'.
   -c, --cutLines        Draw extra lines for cutting. Default is no extra lines. Set this option if your image(s) are very light.
+  --help                Prints this usage text.
 ```
 
 
