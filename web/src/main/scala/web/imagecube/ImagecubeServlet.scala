@@ -1,7 +1,7 @@
 package web.imagecube
 
 import org.scalatra._
-import org.scalatra.servlet.{FileUploadSupport}
+import org.scalatra.servlet.FileUploadSupport
 
 import imagecube.Imagecube._
 import web.imagecube.Templates._
