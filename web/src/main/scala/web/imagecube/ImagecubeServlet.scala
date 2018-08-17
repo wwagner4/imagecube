@@ -8,7 +8,7 @@ import web.imagecube.Templates._
 
 class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with FlashMapSupport {
 
-  val limit = 2500
+  val limit = 8000
 
   val ctx = "/imagecube"
   //val ctx = ""
@@ -38,7 +38,7 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
       <p>The maximum image size accepted is $limit k pixel</p>
       <p>Click on the image below to see more cubes I have already created</p>
 
-      <p><a target="_blank" href="https://flic.kr/s/aHskVeDKWN"><img src="http://entelijan.net/cubes/cube.png" alt="imagecube"></a></p>
+      <p><a target="_blank" href="https://flic.kr/s/aHskVeDKWN">Click here to see some example cubes</a></p>
 
     """
     templ(content, BGCOL_normal)
