@@ -1,5 +1,5 @@
-addSbtPlugin("org.scalatra.scalate" % "sbt-scalate-precompiler" % "1.8.0.1")
+addSbtPlugin("com.typesafe.sbt" % "sbt-twirl" % "1.3.13")
 
-addSbtPlugin("org.scalatra.sbt" % "scalatra-sbt" % "0.5.1")
+addSbtPlugin("org.scalatra.sbt" % "sbt-scalatra" % "1.0.2")
 
-addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.4")
+addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.7")
