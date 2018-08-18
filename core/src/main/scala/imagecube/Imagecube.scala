@@ -62,8 +62,8 @@ object Imagecube {
 
   def transformImageWeb(in: InputStream, inMime: String, outMime: String, maxSize: Int): Array[Byte] = {
     val bi = readImageFromStream(in, inMime)
-    if (bi.getWidth() * bi.getHeight() > maxSize * 1000) {
-      throw new IllegalStateException(s"Your image exceeded the maximum size of $maxSize k pixel")
+    if (bi.getWidth() * bi.getHeight() > maxSize * 1000000) {
+      throw new IllegalStateException(s"Your image exceeded the maximum size of $maxSize m pixel")
     }
     in.close()
     val bo = transformImage(bi, HANDED_Right, cutLines = false)

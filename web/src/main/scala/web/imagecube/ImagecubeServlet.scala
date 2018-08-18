@@ -8,10 +8,10 @@ import web.imagecube.Templates._
 
 class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with FlashMapSupport {
 
-  val limit = 8000
+  val limit = 12
 
-  val ctx = "/imagecube"
-  //val ctx = ""
+  //val ctx = "/imagecube"
+  val ctx = ""
 
   val uploadUrlStr = "/upload"
   val startUrlStr = "/"
@@ -22,7 +22,7 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
 
     val content =
       s"""
-      <p>Transform your images to cubes</p>
+      <p>Transform your images to cubes (<a target="_blank" href="https://flic.kr/s/aHskVeDKWN">Examples...</a>)</p>
       <form id="myForm" action="$uploadUrl" method="post" enctype="multipart/form-data">
        <p>
 
@@ -35,11 +35,7 @@ class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with Flash
         After you select an image
         a cube will be created and immediately downloaded.
       </p>
-      <p>The maximum image size accepted is $limit k pixel</p>
-      <p>Click on the image below to see more cubes I have already created</p>
-
-      <p><a target="_blank" href="https://flic.kr/s/aHskVeDKWN">Click here to see some example cubes</a></p>
-
+      <p>The maximum image size accepted is $limit m pixel</p>
     """
     templ(content, BGCOL_normal)
   }
