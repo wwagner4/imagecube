@@ -68,7 +68,6 @@ $additionalHeaderContent
 <h1>imagecube</h1>
 $content
 <p class="s" ><a href="http://entelijan.net">entelijan.net ... </a>
-<p class="s" ><a href="https://github.com/wwagner4/imagecube">on github ... </a>
 </body>
 </html>  
    """
