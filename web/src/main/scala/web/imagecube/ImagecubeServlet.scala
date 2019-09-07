@@ -8,7 +8,7 @@ import web.imagecube.Templates._
 
 class ImagecubeServlet extends ScalatraServlet with FileUploadSupport with FlashMapSupport {
 
-  val limit = 12
+  val limit = 30
 
   //val ctx = "/imagecube"
   val ctx = ""
